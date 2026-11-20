@@ -2,7 +2,7 @@
 /* =========================================================
    PREPAREKORA — SINGLE FRONTEND APPLICATION
    Login + Dashboard + Management + MCQ Studio
-   Firebase Authentication + Cloudflare Worker + R2
+   Firebase Authentication + Cloudflare Worker + Cloudinary
 ========================================================= */
 
 "use strict";
@@ -798,8 +798,6 @@ function renderEmptyRow(tbody, colspan, message) {
 
 function addSelectOptions(select, items, label) {
   if (!select) return;
-
-  const first = select.options[0];
 
   select.replaceChildren();
 
@@ -1667,7 +1665,7 @@ async function loadSettings() {
       ["Timezone", "Asia/Kolkata (IST)"],
       ["Set ID format", "PREPAREKORA/EXAM/SUBJECT/MM/YY/NNNN"],
       ["Subjects", "GK, SS, ENG, MATH, LR, CK"],
-      ["Storage", "Private Cloudflare R2"],
+      ["Storage", "Cloudinary (authenticated answer images)"],
       ["Database", "Firebase Realtime Database"]
     ];
 
@@ -1983,12 +1981,12 @@ function updatePoster() {
   } else {
     PK.text(
       "commentsTitle",
-      PK.$("commentsTitle")?.value || "COMMENTS"
+      PK.$("commentsTitleInput")?.value || "COMMENTS"
     );
 
     PK.text(
       "commentsText",
-      PK.$("commentsText")?.value ||
+      PK.$("commentsTextInput")?.value ||
         "Share your answer in the comments."
     );
   }
@@ -2462,8 +2460,10 @@ function initializeStudio() {
 
   PK.$("subjectSelect").addEventListener("change", updatePoster);
 
-  PK.$("commentsTitle").addEventListener("input", updatePoster);
-  PK.$("commentsText").addEventListener("input", updatePoster);
+  // Form inputs update the original poster preview elements.
+  PK.$("commentsTitleInput").addEventListener("input", updatePoster);
+  PK.$("commentsTextInput").addEventListener("input", updatePoster);
+
   PK.$("qrUrl").addEventListener("change", updateQR);
 
   PK.$("aspectRatio").addEventListener("change", updateDimensions);
