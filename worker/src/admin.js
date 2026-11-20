@@ -1,3 +1,4 @@
+
 import {
   generateCloudinarySignature,
   createAuthenticatedDeliveryUrl
@@ -13,10 +14,11 @@ const DEFAULT_SUBJECTS = [
 ];
 
 const DEFAULT_EXAMS = [
-  { code: "MOCK", name: "Mock Test", active: true }
+  { code: "ADRE", name: "ADRE", active: true }
 ];
 
 const MAX_IMAGE_BYTES = 20 * 1024 * 1024;
+
 const ALLOWED_IMAGE_TYPES = [
   "image/png",
   "image/jpeg",
@@ -51,9 +53,6 @@ function decodePathValue(value) {
 
 /* ---------------------------------------------------------
    FIREBASE REALTIME DATABASE HELPERS
-
-   Uses the authenticated Firebase ID token.
-   Firebase Security Rules must authorize the Admin UID.
 --------------------------------------------------------- */
 
 function encodeKey(value) {
@@ -287,8 +286,13 @@ function getMonthYear() {
     year: "2-digit"
   }).formatToParts(new Date());
 
-  const month = parts.find(item => item.type === "month")?.value;
-  const year = parts.find(item => item.type === "year")?.value;
+  const month = parts.find(
+    item => item.type === "month"
+  )?.value;
+
+  const year = parts.find(
+    item => item.type === "year"
+  )?.value;
 
   return { month, year };
 }
@@ -324,8 +328,10 @@ function validateDraft(draft) {
     "Subject"
   );
 
-  if (!Array.isArray(draft.questions) ||
-      draft.questions.length !== 5) {
+  if (
+    !Array.isArray(draft.questions) ||
+    draft.questions.length !== 5
+  ) {
     throw new Error("Exactly five questions are required.");
   }
 
@@ -344,33 +350,38 @@ function validateDraft(draft) {
       throw new Error(`Question ${number} is empty.`);
     }
 
-    if (!Array.isArray(question.options) ||
-        question.options.length !== 4) {
+    if (
+      !Array.isArray(question.options) ||
+      question.options.length !== 4
+    ) {
       throw new Error(
         `Question ${number} must have four options.`
       );
     }
 
-    const options = question.options.map((option, optionIndex) => {
-      const expectedLetter = ["A", "B", "C", "D"][optionIndex];
+    const options = question.options.map(
+      (option, optionIndex) => {
+        const expectedLetter =
+          ["A", "B", "C", "D"][optionIndex];
 
-      if (
-        !option ||
-        option.letter !== expectedLetter ||
-        !String(option.text || "").trim()
-      ) {
-        throw new Error(
-          `Question ${number}: Option ${expectedLetter} is invalid.`
-        );
+        if (
+          !option ||
+          option.letter !== expectedLetter ||
+          !String(option.text || "").trim()
+        ) {
+          throw new Error(
+            `Question ${number}: Option ${expectedLetter} is invalid.`
+          );
+        }
+
+        return {
+          letter: expectedLetter,
+          text: String(option.text),
+          english: String(option.english || ""),
+          assamese: String(option.assamese || "")
+        };
       }
-
-      return {
-        letter: expectedLetter,
-        text: String(option.text),
-        english: String(option.english || ""),
-        assamese: String(option.assamese || "")
-      };
-    });
+    );
 
     const answer = String(question.answer || "")
       .toUpperCase();
@@ -548,22 +559,40 @@ async function uploadAsset(request, env, token, uid) {
     );
   }
 
+  // Generate a signature matching the selected Cloudinary delivery type.
+  const deliveryType = imageMode === "answer"
+    ? "authenticated"
+    : "upload";
+
   const signatureData =
-    await generateCloudinarySignature(env);
+    await generateCloudinarySignature(
+      env,
+      deliveryType
+    );
 
   const uploadForm = new FormData();
 
-  uploadForm.append("file", file, file.name || `Q${questionNumber}.png`);
+  uploadForm.append(
+    "file",
+    file,
+    file.name || `Q${questionNumber}.png`
+  );
+
   uploadForm.append("api_key", signatureData.apiKey);
-  uploadForm.append("timestamp", String(signatureData.timestamp));
-  uploadForm.append("upload_preset", signatureData.uploadPreset);
+  uploadForm.append(
+    "timestamp",
+    String(signatureData.timestamp)
+  );
+  uploadForm.append(
+    "upload_preset",
+    signatureData.uploadPreset
+  );
   uploadForm.append("signature", signatureData.signature);
 
-  // Teaser images are public for publishing.
-  // Answer images use authenticated delivery.
-const uploadPath = imageMode === "answer"
-  ? "image/authenticated"
-  : "image/upload";
+  // Cloudinary REST API uses the delivery type in the endpoint path.
+  const uploadPath = imageMode === "answer"
+    ? "image/authenticated"
+    : "image/upload";
 
   const cloudinaryUrl =
     `https://api.cloudinary.com/v1_1/` +
@@ -574,7 +603,9 @@ const uploadPath = imageMode === "answer"
     body: uploadForm
   });
 
-  const uploaded = await uploadResponse.json().catch(() => null);
+  const uploaded = await uploadResponse
+    .json()
+    .catch(() => null);
 
   if (!uploadResponse.ok || !uploaded?.public_id) {
     console.error(
@@ -593,9 +624,7 @@ const uploadPath = imageMode === "answer"
     bytes: Number(uploaded.bytes || file.size),
     imageMode,
     questionNumber,
-    deliveryType: imageMode === "answer"
-      ? "authenticated"
-      : "upload",
+    deliveryType,
     uploadedAt: Date.now()
   };
 
@@ -604,6 +633,7 @@ const uploadPath = imageMode === "answer"
   }
 
   set.assets = set.assets || {};
+
   set.assets[String(questionNumber)] =
     set.assets[String(questionNumber)] || {};
 
@@ -641,9 +671,14 @@ async function completeGeneration(env, token, setId, uid) {
   for (let number = 1; number <= 5; number++) {
     const assets = set.assets?.[String(number)];
 
-    if (!assets?.teaser || !assets?.answer) {
+    if (
+      !assets?.teaser ||
+      !assets?.answer ||
+      assets.teaser.deliveryType !== "upload" ||
+      assets.answer.deliveryType !== "authenticated"
+    ) {
       return errorResponse(
-        `Images are incomplete for question ${number}.`
+        `Images or delivery settings are incomplete for question ${number}.`
       );
     }
 
@@ -718,7 +753,9 @@ async function markPosted(request, env, token, setId, uid) {
   );
 
   set.postedAt = now;
+
   set.postUrl = postUrl;
+
   set.revealAt =
     now + Math.max(1, configuredDelay) * 60 * 60 * 1000;
 
@@ -832,7 +869,8 @@ async function getAnswerImage(env, token, setId, questionNumber) {
   return new Response(imageResponse.body, {
     status: 200,
     headers: {
-      "Content-Type": imageResponse.headers.get("Content-Type") || "image/png",
+      "Content-Type":
+        imageResponse.headers.get("Content-Type") || "image/png",
       "Cache-Control": "private, no-store",
       "X-Content-Type-Options": "nosniff"
     }
@@ -876,7 +914,9 @@ export async function handleAdminRequest(
             (total, set) => total + (set.questions?.length || 0),
             0
           ),
-          postedSets: sets.filter(set => Boolean(set.postedAt)).length,
+          postedSets: sets.filter(
+            set => Boolean(set.postedAt)
+          ).length,
           pendingReveals: sets.filter(
             set => set.postedAt && !set.revealedAt
           ).length
@@ -909,7 +949,8 @@ export async function handleAdminRequest(
       const sets = await getSets(env, token);
 
       sets.sort((a, b) =>
-        Number(b.createdAt || 0) - Number(a.createdAt || 0)
+        Number(b.createdAt || 0) -
+        Number(a.createdAt || 0)
       );
 
       return json({ ok: true, sets });
@@ -927,7 +968,8 @@ export async function handleAdminRequest(
       const history = await getSets(env, token);
 
       history.sort((a, b) =>
-        Number(b.createdAt || 0) - Number(a.createdAt || 0)
+        Number(b.createdAt || 0) -
+        Number(a.createdAt || 0)
       );
 
       return json({ ok: true, history });
@@ -947,18 +989,27 @@ export async function handleAdminRequest(
     }
 
     if (path === "/api/admin/activities" && method === "GET") {
-      const data = await databaseRequest(env, token, "activities");
+      const data = await databaseRequest(
+        env,
+        token,
+        "activities"
+      );
 
       const activities = normalizeCatalog(data)
         .sort((a, b) =>
-          Number(b.timestamp || 0) - Number(a.timestamp || 0)
+          Number(b.timestamp || 0) -
+          Number(a.timestamp || 0)
         );
 
       return json({ ok: true, activities });
     }
 
     if (path === "/api/admin/settings" && method === "GET") {
-      const data = await databaseRequest(env, token, "settings");
+      const data = await databaseRequest(
+        env,
+        token,
+        "settings"
+      );
 
       const settings = {
         revealDelayHours: Number(
