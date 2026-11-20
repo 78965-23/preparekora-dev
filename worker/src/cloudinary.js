@@ -2,6 +2,7 @@ const UPLOAD_PRESET = "preparekora_mcq";
 
 async function sha1(value) {
   const data = new TextEncoder().encode(value);
+
   return new Uint8Array(
     await crypto.subtle.digest("SHA-1", data)
   );
@@ -42,14 +43,14 @@ export async function generateCloudinarySignature(
     throw new Error("Invalid Cloudinary delivery type.");
   }
 
+  const timestamp = Math.floor(Date.now() / 1000);
+
+  // The delivery type is selected through the REST endpoint path.
+  // It is not included as a separate signed form parameter.
   const parameters = {
-    timestamp: Math.floor(Date.now() / 1000),
+    timestamp,
     upload_preset: UPLOAD_PRESET
   };
-
-  if (deliveryType === "authenticated") {
-    parameters.type = "authenticated";
-  }
 
   const signatureString =
     Object.keys(parameters)
@@ -57,14 +58,12 @@ export async function generateCloudinarySignature(
       .map(key => `${key}=${parameters[key]}`)
       .join("&") + apiSecret;
 
-  const signature = toHex(
-    await sha1(signatureString)
-  );
+  const signature = toHex(await sha1(signatureString));
 
   return {
     cloudName,
     apiKey,
-    timestamp: parameters.timestamp,
+    timestamp,
     uploadPreset: UPLOAD_PRESET,
     deliveryType,
     signature
@@ -97,6 +96,7 @@ export async function createAuthenticatedDeliveryUrl(
   const publicId = String(asset.publicId);
   const format = String(asset.format);
 
+  // Sign the exact URL path that follows the signature component.
   const resourcePath =
     `v${version}/${publicId}.${format}`;
 
