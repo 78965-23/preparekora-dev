@@ -2,9 +2,9 @@ const UPLOAD_PRESET = "preparekora_mcq";
 
 async function sha1(value) {
   const data = new TextEncoder().encode(value);
-  const digest = await crypto.subtle.digest("SHA-1", data);
-
-  return new Uint8Array(digest);
+  return new Uint8Array(
+    await crypto.subtle.digest("SHA-1", data)
+  );
 }
 
 function toHex(bytes) {
@@ -26,7 +26,10 @@ function toBase64Url(bytes) {
     .replace(/=+$/, "");
 }
 
-export async function generateCloudinarySignature(env) {
+export async function generateCloudinarySignature(
+  env,
+  deliveryType = "upload"
+) {
   const cloudName = env.CLOUDINARY_CLOUD_NAME;
   const apiKey = env.CLOUDINARY_API_KEY;
   const apiSecret = env.CLOUDINARY_API_SECRET;
@@ -35,12 +38,18 @@ export async function generateCloudinarySignature(env) {
     throw new Error("Cloudinary configuration is incomplete.");
   }
 
-  const timestamp = Math.floor(Date.now() / 1000);
+  if (!["upload", "authenticated"].includes(deliveryType)) {
+    throw new Error("Invalid Cloudinary delivery type.");
+  }
 
   const parameters = {
-    upload_preset: UPLOAD_PRESET,
-    timestamp
+    timestamp: Math.floor(Date.now() / 1000),
+    upload_preset: UPLOAD_PRESET
   };
+
+  if (deliveryType === "authenticated") {
+    parameters.type = "authenticated";
+  }
 
   const signatureString =
     Object.keys(parameters)
@@ -55,13 +64,17 @@ export async function generateCloudinarySignature(env) {
   return {
     cloudName,
     apiKey,
-    timestamp,
+    timestamp: parameters.timestamp,
     uploadPreset: UPLOAD_PRESET,
+    deliveryType,
     signature
   };
 }
 
-export async function createAuthenticatedDeliveryUrl(env, asset) {
+export async function createAuthenticatedDeliveryUrl(
+  env,
+  asset
+) {
   const cloudName = env.CLOUDINARY_CLOUD_NAME;
   const apiSecret = env.CLOUDINARY_API_SECRET;
 
