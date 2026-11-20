@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Preparekora administration login">
+
+  <title>Sign In | Preparekora</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Assamese:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Existing authentication stylesheet -->
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+
+<body class="auth-page">
+
+  <main class="auth-container">
+
+    <section class="auth-card" aria-labelledby="loginHeading">
+
+      <!-- BRAND -->
+      <header class="auth-header">
+
+        <a
+          href="index.html"
+          class="auth-brand"
+          aria-label="Preparekora home"
+        >
+          <span class="auth-brand-name">PREPAREKORA</span>
+        </a>
+
+        <span class="auth-label">ADMINISTRATION PORTAL</span>
+
+        <h1 id="loginHeading">Welcome back</h1>
+
+        <p class="auth-description">
+          Sign in to manage your MCQ sets, images and publishing workflow.
+        </p>
+
+      </header>
+
+      <!-- LOGIN FORM -->
+      <form id="loginForm" class="auth-form" novalidate>
+
+        <div class="auth-field">
+
+          <label for="loginEmail">Email Address</label>
+
+          <input
+            type="email"
+            id="loginEmail"
+            name="email"
+            placeholder="Enter your email address"
+            autocomplete="username"
+            inputmode="email"
+            required
+          >
+
+        </div>
+
+        <div class="auth-field">
+
+          <label for="loginPassword">Password</label>
+
+          <div class="auth-password-wrapper">
+
+            <input
+              type="password"
+              id="loginPassword"
+              name="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            >
+
+            <button
+              type="button"
+              id="togglePassword"
+              class="auth-password-toggle"
+              aria-label="Show password"
+              aria-controls="loginPassword"
+              aria-pressed="false"
+            >
+
+              <svg
+                viewBox="0 0 24 24"
+                width="19"
+                height="19"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- FORGOT PASSWORD -->
+        <div class="auth-form-options">
+
+          <button
+            type="button"
+            id="forgotPasswordButton"
+            class="auth-text-button"
+          >
+            Forgot password?
+          </button>
+
+        </div>
+
+        <!-- AUTHENTICATION STATUS -->
+        <div
+          id="authStatus"
+          class="auth-status"
+          role="status"
+          aria-live="polite"
+        ></div>
+
+        <!-- SIGN IN -->
+        <button
+          type="submit"
+          id="loginButton"
+          class="auth-submit"
+        >
+          <span class="auth-button-text">Sign In</span>
+        </button>
+
+      </form>
+
+      <!-- FOOTER -->
+      <footer class="auth-footer">
+
+        <span>PREPAREKORA</span>
+
+        <span>MCQ Management System</span>
+
+      </footer>
+
+    </section>
+
+  </main>
+
+  <!-- FIREBASE AND AUTHENTICATION -->
+  <script type="module" src="js/firebase.js"></script>
+  <script defer src="js/auth.js"></script>
+
+</body>
+</html>
