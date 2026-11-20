@@ -11,16 +11,11 @@
     "BRAND": "Preparekora",
     "FIREBASE_PROJECT_ID": "preparekora-dev",
     "FIREBASE_DATABASE_URL": "https://preparekora-dev-default-rtdb.firebaseio.com",
+    "ALLOWED_ORIGIN": "https://preparekora.dev",
     "TIME_ZONE": "Asia/Kolkata",
     "REVEAL_DELAY_HOURS": "6",
     "ID_SEQUENCE_START": "5"
   },
-  "r2_buckets": [
-    {
-      "binding": "ASSETS_BUCKET",
-      "bucket_name": "preparekora-assets"
-    }
-  ],
   "triggers": {
     "crons": [
       "*/1 * * * *"
