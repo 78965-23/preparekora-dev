@@ -1,8 +1,7 @@
-
 import { handleApiRequest } from "./router.js";
 import { handleScheduledReveal } from "./cron.js";
 
-const jsonResponse = (data, status, origin) => {
+function jsonResponse(data, status, origin) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
@@ -14,25 +13,20 @@ const jsonResponse = (data, status, origin) => {
       "Vary": "Origin"
     }
   });
-};
+}
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    const configuredOrigin =
-      env.ALLOWED_ORIGIN || "https://preparekora.dev";
+    const origin = env.ALLOWED_ORIGIN || "https://preparekora.dev";
 
     if (url.pathname === "/api/public-config") {
       if (request.method === "OPTIONS") {
-        return jsonResponse({}, 204, configuredOrigin);
+        return jsonResponse({}, 204, origin);
       }
 
       if (request.method !== "GET") {
-        return jsonResponse(
-          { error: "Method not allowed" },
-          405,
-          configuredOrigin
-        );
+        return jsonResponse({ error: "Method not allowed" }, 405, origin);
       }
 
       const required = [
@@ -54,7 +48,7 @@ export default {
             missing
           },
           503,
-          configuredOrigin
+          origin
         );
       }
 
@@ -63,8 +57,8 @@ export default {
           firebaseConfig: {
             apiKey: env.FIREBASE_WEB_API_KEY,
             authDomain: env.FIREBASE_AUTH_DOMAIN,
-            databaseURL: env.FIREBASE_DATABASE_URL,
             projectId: env.FIREBASE_PROJECT_ID,
+            databaseURL: env.FIREBASE_DATABASE_URL,
             storageBucket: env.FIREBASE_STORAGE_BUCKET,
             messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID,
             appId: env.FIREBASE_APP_ID,
@@ -73,7 +67,7 @@ export default {
           adminUid: env.ADMIN_UID || ""
         },
         200,
-        configuredOrigin
+        origin
       );
     }
 
@@ -85,14 +79,12 @@ export default {
       return jsonResponse(
         { error: "Internal server error" },
         500,
-        configuredOrigin
+        origin
       );
     }
   },
 
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(
-      handleScheduledReveal(event, env, ctx)
-    );
+    ctx.waitUntil(handleScheduledReveal(event, env, ctx));
   }
 };
