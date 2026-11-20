@@ -561,9 +561,9 @@ async function uploadAsset(request, env, token, uid) {
 
   // Teaser images are public for publishing.
   // Answer images use authenticated delivery.
-  const uploadPath = imageMode === "answer"
-    ? "image/authenticated/upload"
-    : "image/upload";
+const uploadPath = imageMode === "answer"
+  ? "image/authenticated"
+  : "image/upload";
 
   const cloudinaryUrl =
     `https://api.cloudinary.com/v1_1/` +
