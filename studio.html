@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Preparekora MCQ creation and poster generation studio">
+
+  <title>MCQ Studio | Preparekora</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Assamese:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Single Shared Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="admin-page studio-page">
+
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="app-sidebar" id="sidebar">
+
+      <a href="admin.html" class="app-brand">
+        <span class="app-brand-name">PREPAREKORA</span>
+        <span class="app-brand-subtitle">Administration</span>
+      </a>
+
+      <nav class="app-navigation" aria-label="Main navigation">
+
+        <a href="admin.html#dashboard" class="nav-link">
+          <span>Dashboard</span>
+        </a>
+
+        <a href="admin.html#sets" class="nav-link">
+          <span>Manage Sets</span>
+        </a>
+
+        <a href="admin.html#reveal" class="nav-link">
+          <span>Answer Reveal</span>
+        </a>
+
+        <a href="admin.html#history" class="nav-link">
+          <span>History</span>
+        </a>
+
+        <a href="admin.html#subjects" class="nav-link">
+          <span>Subjects</span>
+        </a>
+
+        <a href="admin.html#settings" class="nav-link">
+          <span>Settings</span>
+        </a>
+
+        <a href="studio.html" class="nav-link is-active">
+          <span>Create MCQ Set</span>
+        </a>
+
+      </nav>
+
+      <div class="sidebar-bottom">
+
+        <div class="sidebar-account">
+          <span class="account-indicator"></span>
+          <span>Administrator</span>
+        </div>
+
+        <button
+          type="button"
+          id="logoutButton"
+          class="btn btn-secondary btn-full"
+        >
+          Sign Out
+        </button>
+
+      </div>
+
+    </aside>
+
+    <!-- MAIN APPLICATION -->
+
+    <div class="app-main">
+
+      <!-- COMMON HEADER -->
+
+      <header class="app-header">
+
+        <button
+          type="button"
+          id="sidebarToggle"
+          class="btn btn-icon"
+          aria-label="Toggle navigation"
+          aria-controls="sidebar"
+          aria-expanded="false"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+
+        <div class="header-brand-mobile">
+          PREPAREKORA
+        </div>
+
+        <div class="header-right">
+          <span id="adminEmail" class="header-account">
+            Administrator
+          </span>
+        </div>
+
+      </header>
+
+      <!-- STUDIO CONTENT -->
+
+      <main class="app-content">
+
+        <header class="page-heading">
+
+          <div>
+            <span class="page-eyebrow">CONTENT CREATION</span>
+            <h1>MCQ Studio</h1>
+            <p>Create five-question MCQ sets and generate their Instagram images.</p>
+          </div>
+
+          <a
+            href="admin.html#dashboard"
+            class="btn btn-secondary"
+          >
+            Back to Dashboard
+          </a>
+
+        </header>
+
+        <!-- =================================
+             SET CONFIGURATION
+        ================================== -->
+
+        <section class="content-panel">
+
+          <div class="panel-heading">
+            <div>
+              <h2>Set Configuration</h2>
+              <p>Select the exam, subject and language.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+
+            <div class="form-field">
+
+              <label for="examSelect">Examination</label>
+
+              <select
+                id="examSelect"
+                class="form-control"
+                required
+              >
+                <option value="">Select Examination</option>
+                <option value="ADRE">ADRE</option>
+              </select>
+
+            </div>
+
+            <div class="form-field">
+
+              <label for="subjectSelect">Subject</label>
+
+              <select
+                id="subjectSelect"
+                class="form-control"
+                required
+              >
+                <option value="">Select Subject</option>
+                <option value="GK">General Knowledge</option>
+                <option value="SS">Social Studies</option>
+                <option value="ENG">English</option>
+                <option value="MATH">Mathematics</option>
+                <option value="LR">Logical Reasoning</option>
+                <option value="CK">Computer Knowledge</option>
+              </select>
+
+            </div>
+
+            <div class="form-field">
+
+              <label for="languageMode">Question Language</label>
+
+              <select id="languageMode" class="form-control">
+                <option value="bilingual">English + Assamese</option>
+                <option value="en">English</option>
+                <option value="as">Assamese</option>
+              </select>
+
+            </div>
+
+          </div>
+
+          <div class="set-id-preview">
+
+            <span>Generated Set ID</span>
+
+            <strong id="setIdPreview">
+              Will be generated by the server
+            </strong>
+
+            <span class="field-hint">
+              The final ID is allocated securely by the Worker.
+            </span>
+
+          </div>
+
+        </section>
+
+        <!-- =================================
+             BULK QUESTION INPUT
+        ================================== -->
+
+        <section class="content-panel">
+
+          <div class="panel-heading">
+            <div>
+              <h2>MCQ Content</h2>
+              <p>Enter exactly five questions with four options and their answers.</p>
+            </div>
+          </div>
+
+          <div class="form-field">
+
+            <label for="bulkContent">Bulk MCQ Content</label>
+
+            <textarea
+              id="bulkContent"
+              class="form-control mcq-content-input"
+              rows="18"
+              spellcheck="false"
+              placeholder="Q: What is the capital of Assam? (অসমৰ ৰাজধানী কি?)
+
+A) Guwahati (গুৱাহাটী)
+B) Dispur (দিছপুৰ)
+C) Jorhat (যোৰহাট)
+D) Silchar (শিলচৰ)
+
+Ans: B
+
+Explanation: Dispur is the capital of Assam.
+
+Q: Second question...
+...
+Q: Fifth question..."
+              required
+            ></textarea>
+
+            <span class="field-hint">
+              Use Q:, A), B), C), D), Ans: and optional Explanation:.
+            </span>
+
+          </div>
+
+          <div class="studio-action-row">
+
+            <button
+              type="button"
+              id="previewButton"
+              class="btn btn-secondary"
+            >
+              Validate and Preview
+            </button>
+
+            <span id="editorStatus" role="status" aria-live="polite">
+              Enter your five MCQs to begin.
+            </span>
+
+          </div>
+
+        </section>
+
+        <!-- =================================
+             QUESTION PREVIEW CONTROLS
+        ================================== -->
+
+        <section class="content-panel">
+
+          <div class="panel-heading">
+            <div>
+              <h2>Poster Preview</h2>
+              <p>Review each question before image generation.</p>
+            </div>
+          </div>
+
+          <div class="form-grid">
+
+            <div class="form-field">
+
+              <label for="questionSelector">Question</label>
+
+              <select
+                id="questionSelector"
+                class="form-control"
+              >
+                <option value="0">Question 1</option>
+                <option value="1">Question 2</option>
+                <option value="2">Question 3</option>
+                <option value="3">Question 4</option>
+                <option value="4">Question 5</option>
+              </select>
+
+            </div>
+
+            <div class="form-field">
+
+              <label for="imageMode">Image Type</label>
+
+              <select id="imageMode" class="form-control">
+                <option value="teaser">Teaser Image</option>
+                <option value="answer">Answer Image</option>
+              </select>
+
+            </div>
+
+            <div class="form-field">
+
+              <label for="aspectRatio">Image Aspect Ratio</label>
+
+              <select id="aspectRatio" class="form-control">
+                <option value="1:1">Square — 1:1</option>
+                <option value="16:9">Landscape — 16:9</option>
+                <option value="4:3">Landscape — 4:3</option>
+                <option value="9:16">Portrait — 9:16</option>
+                <option value="custom">Custom Dimensions</option>
+              </select>
+
+            </div>
+
+          </div>
+
+          <!-- CUSTOM DIMENSIONS -->
+
+          <div id="customDimensions" hidden>
+
+            <div class="form-grid">
+
+              <div class="form-field">
+                <label for="customWidth">Width (px)</label>
+
+                <input
+                  type="number"
+                  id="customWidth"
+                  class="form-control"
+                  min="400"
+                  max="8000"
+                  value="1080"
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="customHeight">Height (px)</label>
+
+                <input
+                  type="number"
+                  id="customHeight"
+                  class="form-control"
+                  min="400"
+                  max="8000"
+                  value="1080"
+                >
+              </div>
+
+            </div>
+
+          </div>
+
+          <div
+            id="canvasDimensions"
+            class="field-hint"
+            aria-live="polite"
+          >
+            Output dimensions: 1080 × 1080 px
+          </div>
+
+          <!-- ORIGINAL POSTER STRUCTURE: PRESERVE ITS CSS -->
+
+          <div class="poster-stage">
+
+            <div class="poster" id="poster">
+
+              <div class="poster-header">
+
+                <div class="poster-brand">
+
+                  <div class="poster-brand-name">
+                    PREPAREKORA
+                  </div>
+
+                  <div class="poster-brand-domain">
+                    preparekora.dev
+                  </div>
+
+                </div>
+
+                <div class="poster-id" id="posterId">
+                  PREPAREKORA
+                </div>
+
+              </div>
+
+              <div class="poster-content">
+
+                <div
+                  class="poster-subject"
+                  id="posterSubject"
+                >
+                  GENERAL KNOWLEDGE
+                </div>
+
+                <div
+                  class="poster-question-area"
+                  id="posterQuestionArea"
+                >
+
+                  <div
+                    class="poster-question"
+                    id="posterQuestion"
+                  >
+                    Your MCQ question will appear here.
+                  </div>
+
+                </div>
+
+                <div class="poster-options">
+
+                  <div class="poster-option" data-option="A">
+                    <span class="poster-option-letter">A</span>
+                    <span
+                      class="poster-option-text"
+                      id="optionAText"
+                    >
+                      Option A
+                    </span>
+                  </div>
+
+                  <div class="poster-option" data-option="B">
+                    <span class="poster-option-letter">B</span>
+                    <span
+                      class="poster-option-text"
+                      id="optionBText"
+                    >
+                      Option B
+                    </span>
+                  </div>
+
+                  <div class="poster-option" data-option="C">
+                    <span class="poster-option-letter">C</span>
+                    <span
+                      class="poster-option-text"
+                      id="optionCText"
+                    >
+                      Option C
+                    </span>
+                  </div>
+
+                  <div class="poster-option" data-option="D">
+                    <span class="poster-option-letter">D</span>
+                    <span
+                      class="poster-option-text"
+                      id="optionDText"
+                    >
+                      Option D
+                    </span>
+                  </div>
+
+                </div>
+
+                <div class="poster-comments">
+
+                  <div
+                    class="poster-comments-title"
+                    id="commentsTitle"
+                  >
+                    COMMENTS
+                  </div>
+
+                  <div
+                    class="poster-comments-text"
+                    id="commentsText"
+                  >
+                    Share your answer in the comments.
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="poster-footer">
+
+                <div class="poster-qr-container">
+                  <div id="previewQrCode"></div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- =================================
+               POSTER DETAILS
+          ================================== -->
+
+          <div class="studio-details">
+
+            <div class="form-grid">
+
+              <div class="form-field">
+
+                <label for="qrUrl">QR Code Destination URL</label>
+
+                <input
+                  type="url"
+                  id="qrUrl"
+                  class="form-control"
+                  placeholder="https://preparekora.dev"
+                  value="https://preparekora.dev"
+                >
+
+              </div>
+
+              <div class="form-field">
+
+                <label for="exportResolution">Export Resolution</label>
+
+                <select id="exportResolution" class="form-control">
+                  <option value="2">2× Resolution</option>
+                  <option value="4" selected>4× Resolution</option>
+                  <option value="8">8× Resolution</option>
+                </select>
+
+              </div>
+
+            </div>
+
+            <div class="form-grid">
+
+              <div class="form-field">
+
+                <label for="commentsTitle">Comments Heading</label>
+
+                <input
+                  type="text"
+                  id="commentsTitle"
+                  class="form-control"
+                  value="COMMENTS"
+                >
+
+              </div>
+
+              <div class="form-field">
+
+                <label for="commentsText">Comments Text</label>
+
+                <input
+                  type="text"
+                  id="commentsText"
+                  class="form-control"
+                  value="Share your answer in the comments."
+                >
+
+              </div>
+
+            </div>
+
+            <div class="export-information" id="exportInfo">
+              Five teaser images and five answer images will be generated.
+            </div>
+
+          </div>
+
+          <div class="studio-action-row">
+
+            <button
+              type="button"
+              id="exportButton"
+              class="btn btn-primary"
+              disabled
+            >
+              Generate Complete Set — 10 Images
+            </button>
+
+            <span
+              id="generationStatus"
+              role="status"
+              aria-live="polite"
+            >
+              Waiting for MCQ validation.
+            </span>
+
+          </div>
+
+        </section>
+
+        <!-- =================================
+             GENERATION PROGRESS
+        ================================== -->
+
+        <section
+          class="content-panel"
+          id="generationPanel"
+          hidden
+          aria-live="polite"
+        >
+
+          <div class="panel-heading">
+            <div>
+              <h2>Generation Progress</h2>
+              <p>Creating and securely uploading your ten images.</p>
+            </div>
+          </div>
+
+          <div
+            id="generationProgress"
+            class="generation-progress"
+          ></div>
+
+        </section>
+
+      </main>
+
+      <!-- COMMON FOOTER -->
+
+      <footer class="app-footer">
+
+        <span>PREPAREKORA</span>
+
+        <span>MCQ Management System</span>
+
+      </footer>
+
+    </div>
+
+  </div>
+
+  <!-- SET DETAILS / PREVIEW DIALOG -->
+
+  <dialog id="studioDialog" class="app-dialog">
+
+    <div class="dialog-header">
+
+      <div>
+        <h2 id="studioDialogTitle">Studio Information</h2>
+      </div>
+
+      <button
+        type="button"
+        id="closeStudioDialog"
+        class="btn btn-secondary"
+      >
+        Close
+      </button>
+
+    </div>
+
+    <div
+      id="studioDialogContent"
+      class="dialog-content"
+    ></div>
+
+  </dialog>
+
+  <!-- EXTERNAL IMAGE GENERATION LIBRARIES -->
+
+  <script
+    defer
+    src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+  ></script>
+
+  <script
+    defer
+    src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+  ></script>
+
+  <!-- SINGLE FRONTEND APPLICATION -->
+
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
