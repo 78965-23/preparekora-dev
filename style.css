@@ -294,3 +294,181 @@ button, input, a, label { -webkit-tap-highlight-color: transparent; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* =========================================
+   DATABASE — QUESTION EDIT DIALOG
+   ========================================= */
+
+.record-dialog {
+  width: min(760px, calc(100% - 30px));
+  max-width: 760px;
+  max-height: 88vh;
+  max-height: 88dvh;
+  margin: auto;
+  padding: 0;
+  color: var(--text-primary);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  overflow: auto;
+}
+
+.record-dialog::backdrop {
+  background: rgba(12, 15, 20, 0.58);
+  backdrop-filter: blur(3px);
+}
+
+.record-dialog-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 22px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  z-index: 2;
+}
+
+.record-dialog-header h2 {
+  font-size: 19px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+.record-dialog-header p {
+  margin-top: 5px;
+  color: var(--text-secondary);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+.record-dialog-header .eyebrow {
+  margin-bottom: 5px;
+}
+
+.record-dialog-header .icon-button {
+  flex-shrink: 0;
+  font-size: 21px;
+}
+
+#questionEditForm {
+  padding: 23px 24px;
+}
+
+.edit-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 23px;
+}
+
+.edit-field-group {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.edit-field-group h3 {
+  margin-bottom: 13px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.edit-language-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.edit-fields .form-group textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 11px;
+  resize: vertical;
+  color: var(--text-primary);
+  background: #ffffff;
+  border: 1px solid #dfe3e9;
+  border-radius: 8px;
+  outline: none;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.6;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.edit-fields .form-group textarea:focus,
+.edit-fields .form-group select:focus {
+  border-color: #687384;
+  box-shadow: 0 0 0 3px rgba(83, 96, 114, 0.1);
+}
+
+.edit-fields .form-group select {
+  width: 100%;
+  height: 40px;
+  padding: 0 11px;
+  background: #ffffff;
+  border: 1px solid #dfe3e9;
+  border-radius: 8px;
+  font-size: 12px;
+  outline: none;
+}
+
+.edit-form-message {
+  margin-top: 15px;
+  color: var(--danger);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.record-dialog-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 22px -24px -23px;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-top: 1px solid var(--border);
+}
+
+.table-action {
+  min-height: 31px;
+  padding: 0 11px;
+  font-size: 11px;
+}
+
+/* Mobile dialog */
+
+@media (max-width: 600px) {
+  .record-dialog {
+    width: calc(100% - 20px);
+    max-height: 92vh;
+    max-height: 92dvh;
+  }
+
+  .record-dialog-header {
+    padding: 17px 15px;
+  }
+
+  #questionEditForm {
+    padding: 18px 15px;
+  }
+
+  .edit-language-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .record-dialog-actions {
+    margin: 20px -15px -18px;
+    padding: 13px 15px;
+  }
+
+  .record-dialog-actions button {
+    flex: 1;
+  }
+}
