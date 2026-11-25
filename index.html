@@ -4,886 +4,99 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ffffff">
-  <meta name="description" content="PrepareKora — bilingual question-to-image creation workspace">
-  <title>PrepareKora — Image Creation Workspace</title>
+  <meta name="description" content="Private bilingual question-to-image workspace">
+  <title>PrepareKora Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Assamese:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+  <script src="preimg.js" defer></script>
 </head>
 <body>
-  <!-- UI-only preview switch. It does not authenticate a user. -->
-  <input class="view-switch" type="checkbox" id="dashboard-preview" aria-label="Preview dashboard layout">
-
-  <!-- LOGIN SCREEN -->
-  <main class="login-screen" aria-labelledby="login-title">
-    <section class="login-story">
-      <div class="story-topline">
-        <a class="brand brand-light" href="#login" aria-label="PrepareKora home">
-          <span class="brand-symbol">P</span>
-          <span>preparekora<span class="brand-domain">.in</span></span>
-        </a>
-        <span class="secure-label"><span class="status-dot"></span> PRIVATE WORKSPACE</span>
-      </div>
-
-      <div class="story-content">
-        <p class="eyebrow eyebrow-light">YOUR QUESTION-TO-IMAGE WORKSPACE</p>
-        <h1>Turn good questions into <span>clear learning material.</span></h1>
-        <p class="story-copy">Paste bilingual questions, organise your content and automatically create clean educational images using one consistent design.</p>
-        <div class="story-rule"></div>
-        <div class="story-points">
-          <div class="story-point"><span class="point-mark">01</span><span>Paste and validate Q&amp;A or MCQ drafts</span></div>
-          <div class="story-point"><span class="point-mark">02</span><span>Keep your questions organised and private</span></div>
-          <div class="story-point"><span class="point-mark">03</span><span>Generate automatically paginated images</span></div>
-        </div>
-      </div>
-
-      <div class="story-footer">
-        <span>PREPAREKORA WORKSPACE</span>
-        <span>SECURE ACCESS</span>
-      </div>
-    </section>
-
-    <section class="login-panel" id="login">
-      <div class="login-panel-inner">
-        <div class="mobile-brand brand">
-          <span class="brand-symbol">P</span>
-          <span>preparekora<span class="brand-domain">.in</span></span>
-        </div>
-        <div class="login-heading">
-          <p class="eyebrow">WELCOME BACK</p>
-          <h2 id="login-title">Sign in to your account</h2>
-          <p>Enter your account details to continue to your private workspace.</p>
-        </div>
-
-        <form class="login-form" id="login-form" autocomplete="on">
-          <div class="field-group">
-            <label for="email">Email address</label>
-            <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="username" required>
-          </div>
-          <div class="field-group">
-            <div class="field-label-row">
-              <label for="password">Password</label>
-              <a class="text-link" href="#password-help">Forgot password?</a>
-            </div>
-            <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" required>
-          </div>
-          <label class="check-row" for="remember">
-            <input id="remember" name="remember" type="checkbox">
-            <span>Keep me signed in on this device</span>
-          </label>
-          <button class="button button-dark button-full" id="login-submit" type="submit">Sign in</button>
-        </form>
-
-        <div class="login-notice" role="status" aria-live="polite">
-          <span class="notice-mark">i</span>
-          <p id="login-feedback">Sign in securely to access your private workspace.</p>
-        </div>
-
-        <div class="login-bottom">
-          <span>Access is restricted to authorised accounts.</span>
-          <label class="preview-link" for="dashboard-preview">Preview dashboard layout <span aria-hidden="true">→</span></label>
-        </div>
-      </div>
+  <main class="login-screen" id="loginView">
+    <section class="login-card reveal-once">
+      <a class="brand" href="#" aria-label="PrepareKora Studio">
+        <span class="brand-mark">P</span><span>preparekora<span class="brand-light"> studio</span></span>
+      </a>
+      <p class="eyebrow">PRIVATE CONTENT WORKSPACE</p>
+      <h1>Sign in to your studio</h1>
+      <p class="muted intro-copy">Create bilingual question images using your saved subjects and topics.</p>
+      <form id="loginForm" class="form-stack">
+        <label class="field"><span>Email address</span><input id="loginEmail" type="email" autocomplete="username" required placeholder="you@example.com"></label>
+        <label class="field"><span>Password</span><input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Enter password"></label>
+        <button class="button button-dark button-full" id="loginButton" type="submit">Sign in</button>
+      </form>
+      <p class="feedback" id="loginFeedback" role="status" aria-live="polite">Administrator access only.</p>
     </section>
   </main>
 
-  <!-- DASHBOARD / WORKSPACE -->
-  <section class="dashboard-screen" id="dashboard-home" aria-label="PrepareKora workspace">
-    <input class="sidebar-switch" type="checkbox" id="sidebar-toggle" aria-label="Toggle sidebar">
-
-    <header class="dashboard-topbar">
-      <div class="topbar-left">
-        <label class="sidebar-trigger" for="sidebar-toggle" aria-label="Toggle sidebar">
-          <span class="menu-glyph" aria-hidden="true"><i></i><i></i><i></i></span>
-          <span class="trigger-desktop-text">Hide sidebar</span>
-          <span class="trigger-mobile-text">Menu</span>
-        </label>
-        <a class="brand topbar-brand" href="#dashboard-home">
-          <span class="brand-symbol">P</span>
-          <span>preparekora<span class="brand-domain">.in</span></span>
-        </a>
-        <span class="topbar-divider"></span>
-        <span class="breadcrumb-current">Dashboard</span>
-      </div>
-      <div class="topbar-right">
-        <span class="private-chip"><span class="status-dot"></span> Private</span>
-        <div class="user-menu" aria-label="Account">
-          <span class="user-avatar">A</span>
-          <span class="user-menu-copy"><strong>Account</strong><small>Workspace user</small></span>
-          <span class="chevron" aria-hidden="true">⌄</span>
-        </div>
-        <label class="back-preview" for="dashboard-preview">Login preview</label>
-      </div>
+  <div class="app-shell" id="appView" hidden>
+    <header class="topbar">
+      <a class="brand" href="#workspace"><span class="brand-mark">P</span><span>preparekora<span class="brand-light"> studio</span></span></a>
+      <div class="account-area"><span id="accountEmail" class="account-email"></span><button class="button button-light button-small" id="logoutButton" type="button">Sign out</button></div>
     </header>
 
-    <div class="dashboard-layout">
-      <label class="sidebar-backdrop" for="sidebar-toggle" aria-label="Close navigation"></label>
-      <aside class="sidebar" aria-label="Main navigation">
-        <div class="sidebar-section-label">WORKSPACE</div>
-        <nav class="sidebar-nav">
-          <a class="nav-link active" href="#dashboard-home" aria-current="page">
-            <span class="nav-icon icon-grid" aria-hidden="true"></span><span>Dashboard</span>
-          </a>
-          <a class="nav-link" href="#image-generator" data-ig-mode="QA">
-            <span class="nav-icon icon-file" aria-hidden="true"></span><span>Q&amp;A Generator</span>
-          </a>
-          <a class="nav-link" href="#image-generator" data-ig-mode="MCQ">
-            <span class="nav-icon icon-list" aria-hidden="true"></span><span>MCQ Generator</span>
-          </a>
-          <a class="nav-link" href="#image-generator">
-            <span class="nav-icon icon-file" aria-hidden="true"></span><span>Image Generator</span>
-          </a>
-        </nav>
+    <main class="workspace" id="workspace">
+      <section class="page-intro reveal-once">
+        <div><p class="eyebrow">QUESTION TO IMAGE</p><h1>Image workspace</h1><p class="muted">Paste your bilingual questions, preview the layout, then download each page or all pages together.</p></div>
+        <span class="private-label"><span></span> Private workspace</span>
+      </section>
 
-        <div class="sidebar-section-label sidebar-label-spaced">CONTENT MANAGEMENT</div>
-        <nav class="sidebar-nav">
-          <a class="nav-link" href="database.html">
-            <span class="nav-icon icon-book" aria-hidden="true"></span><span>Subjects &amp; Topics</span>
-          </a>
-          <a class="nav-link" href="#history">
-            <span class="nav-icon icon-clock" aria-hidden="true"></span><span>Generation history</span>
-          </a>
-        </nav>
-
-        <div class="sidebar-bottom">
-          <div class="sidebar-help-card">
-            <span class="help-card-kicker">NEED A HAND?</span>
-            <strong>Workspace support</strong>
-            <span>Use the draft format guide to prepare bilingual questions.</span>
-          </div>
-          <a class="nav-link" href="#ig-settings">
-            <span class="nav-icon icon-settings" aria-hidden="true"></span><span>Image settings</span>
-          </a>
-          <div class="sidebar-footnote">PREPAREKORA · PRIVATE WORKSPACE</div>
+      <section class="panel reveal-once" id="contentSetup">
+        <div class="panel-heading"><div><p class="eyebrow">01 · CONTENT</p><h2>Choose subject and topic</h2></div><div class="catalog-actions"><button class="button button-light button-small" id="addSubjectButton" type="button">+ Add subject</button><button class="button button-light button-small" id="addTopicButton" type="button" disabled>+ Add topic</button></div></div>
+        <div class="form-grid three-col">
+          <label class="field"><span>Subject</span><select id="subjectSelect" required><option value="">Loading subjects...</option></select></label>
+          <label class="field"><span>Topic</span><select id="topicSelect" required disabled><option value="">Select topic</option></select></label>
+          <label class="field"><span>Question format</span><select id="inputMode"><option value="AUTO">Auto detect</option><option value="MCQ">MCQ</option><option value="QA">Question &amp; Answer</option></select></label>
         </div>
-      </aside>
+        <div class="draft-heading"><div><h2>Paste question drafts</h2><p class="muted">English and Assamese must stay together as <code>English text (অসমীয়া অনুবাদ)</code>.</p></div><button class="text-button" type="button" id="copyFormatButton">Copy input format</button></div>
+        <div class="format-tip"><strong>MCQ format</strong><code>Q: Question (প্ৰশ্ন)<br>A) Option A (বিকল্প)<br>B) Option B (বিকল্প)<br>C) Option C (বিকল্প)<br>D) Option D (বিকল্প)<br>Ans: C<br>Explanation: Optional explanation (ঐচ্ছিক ব্যাখ্যা)</code><span>For Q&amp;A, use <code>Q:</code> and <code>Ans:</code>. Separate questions with <code>---</code> or start the next block with another <code>Q:</code>.</span></div>
+        <label class="field"><span>Question input</span><textarea id="draftInput" rows="11" spellcheck="false" placeholder="Q: Which ministry lays and maintains the national highways of India? (ভাৰতৰ ৰাষ্ট্ৰীয় ঘাইপথ কোনটো মন্ত্ৰালয়ে নিৰ্মাণ আৰু ৰক্ষণাবেক্ষণ কৰে?)&#10;A) Ministry of Railways (ৰেল মন্ত্ৰালয়)&#10;B) Ministry of Home Affairs (গৃহ পৰিক্ৰমা মন্ত্ৰালয়)&#10;C) Ministry of Road Transport and Highways (সড়ক পৰিবহণ আৰু ঘাইপথ মন্ত্ৰালয়)&#10;D) Ministry of Rural Development (গ্ৰাম্য উন্নয়ন মন্ত্ৰালয়)&#10;Ans: C&#10;---"></textarea></label>
+        <div class="action-row"><button class="button button-dark" id="previewButton" type="button">Parse &amp; preview questions</button><button class="button button-light" id="clearButton" type="button">Clear input</button><span class="feedback" id="draftFeedback" role="status" aria-live="polite"></span></div>
+        <div id="parsedArea" class="parsed-area" hidden><div class="parsed-top"><div><h3>Question review</h3><p class="muted" id="parsedSummary"></p></div><button class="button button-light button-small" id="reparseButton" type="button">Parse again</button></div><div id="parsedList" class="parsed-list"></div></div>
+      </section>
 
-      <main class="workspace-main">
-        <div class="content-wrap">
-          <div class="page-heading-row">
-            <div>
-              <p class="eyebrow">YOUR WORKSPACE</p>
-              <h1>Dashboard</h1>
-              <p class="page-subtitle">Create bilingual questions and turn them into polished educational images.</p>
-            </div>
-            <span class="page-status"><span class="status-dot"></span> Private workspace</span>
-          </div>
-
-          <section class="welcome-banner">
-            <div class="welcome-copy">
-              <span class="banner-kicker">WELCOME TO PREPAREKORA</span>
-              <h2>Your next image starts with a question.</h2>
-              <p>Paste a draft, review the bilingual content, save it and generate consistently designed images.</p>
-            </div>
-            <div class="banner-decoration" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-          </section>
-
-          <section class="section-block" aria-labelledby="create-title">
-            <div class="section-heading">
-              <div><p class="eyebrow">GET STARTED</p><h2 id="create-title">Create content</h2></div>
-              <span class="section-note">Choose a question format</span>
-            </div>
-            <div class="feature-grid">
-              <a class="feature-card" id="qa-generator" href="#image-generator" data-ig-mode="QA">
-                <span class="feature-icon feature-icon-dark"><span class="icon-file" aria-hidden="true"></span></span>
-                <span class="feature-card-body"><strong>Q&amp;A Generator</strong><span>Paste questions with answers in English and Assamese.</span></span>
-                <span class="feature-arrow" aria-hidden="true">↗</span>
-              </a>
-              <a class="feature-card" id="mcq-generator" href="#image-generator" data-ig-mode="MCQ">
-                <span class="feature-icon feature-icon-light"><span class="icon-list" aria-hidden="true"></span></span>
-                <span class="feature-card-body"><strong>MCQ Generator</strong><span>Paste four-option questions, correct answers and explanations.</span></span>
-                <span class="feature-arrow" aria-hidden="true">↗</span>
-              </a>
-              <a class="feature-card" id="subjects" href="database.html">
-                <span class="feature-icon feature-icon-light"><span class="icon-book" aria-hidden="true"></span></span>
-                <span class="feature-card-body"><strong>Manage subjects</strong><span>Open Database Management to organise subjects.</span></span>
-                <span class="feature-arrow" aria-hidden="true">↗</span>
-              </a>
-              <a class="feature-card" id="topics" href="database.html">
-                <span class="feature-icon feature-icon-light"><span class="icon-layers" aria-hidden="true"></span></span>
-                <span class="feature-card-body"><strong>Manage topics</strong><span>Organise topics under their respective subjects.</span></span>
-                <span class="feature-arrow" aria-hidden="true">↗</span>
-              </a>
-            </div>
-          </section>
-
-          <!-- IMAGE GENERATOR WORKSPACE -->
-          <section class="section-block ig-workspace-section" id="image-generator" aria-labelledby="image-generator-title">
-            <div class="section-heading">
-              <div>
-                <p class="eyebrow">QUESTION-TO-IMAGE WORKSPACE</p>
-                <h2 id="image-generator-title">Image Generator</h2>
-              </div>
-              <span class="section-note">Bilingual · Automatically paginated</span>
-            </div>
-
-            <!-- STEP 01: PASTE AND PARSE -->
-            <section class="ig-draft-import" aria-labelledby="ig-draft-title">
-              <div class="ig-card-heading">
-                <div>
-                  <p class="eyebrow">STEP 01</p>
-                  <h3 id="ig-draft-title">Paste Question Drafts</h3>
-                  <p>Paste one or multiple questions. The parser detects MCQ or Q&amp;A blocks, extracts Assamese translations and checks missing fields.</p>
-                </div>
-              </div>
-
-              <div class="ig-draft-mode-row">
-                <div class="field-group">
-                  <label for="ig-draft-mode">Question Format</label>
-                  <select id="ig-draft-mode">
-                    <option value="AUTO">Auto Detect</option>
-                    <option value="MCQ">MCQ Generator</option>
-                    <option value="QA">Q&amp;A Generator</option>
-                  </select>
-                </div>
-                <div class="ig-format-help">
-                  <strong>How to paste</strong>
-                  <span>Use Q:, A)–D), Ans: and Explanation:. Separate blocks with --- or start another Q: line.</span>
-                </div>
-              </div>
-
-              <label class="ig-draft-label" for="ig-draft-input">Your question content</label>
-              <textarea id="ig-draft-input" class="ig-draft-textarea" rows="13" spellcheck="false" placeholder="Q: Which ministry lays and maintains the national highways of India? (ভাৰতৰ ৰাষ্ট্ৰীয় ঘাইপথ কোনটো মন্ত্ৰালয়ে নিৰ্মাণ আৰু ৰক্ষণাবেক্ষণ কৰে?)&#10;A) Ministry of Railways (ৰেল মন্ত্ৰালয়)&#10;B) Ministry of Home Affairs (গৃহ পৰিক্ৰমা মন্ত্ৰালয়)&#10;C) Ministry of Road Transport and Highways (সড়ক পৰিবহণ আৰু ঘাইপথ মন্ত্ৰালয়)&#10;D) Ministry of Rural Development (গ্ৰাম্য উন্নয়ন মন্ত্ৰালয়)&#10;Ans: C&#10;&#10;---&#10;Q: Add another question here...&#10;Ans: Write the answer (উত্তৰ লিখক)"></textarea>
-
-              <p class="ig-draft-guidance">For MCQs, add an English and Assamese explanation in the review fields before saving. The current database requires both languages.</p>
-              <div class="ig-draft-actions">
-                <button type="button" class="button button-dark" id="ig-parse-drafts">Parse &amp; Review Questions</button>
-                <button type="button" class="button" id="ig-clear-drafts">Clear Draft</button>
-                <span class="ig-draft-format-note">English and Assamese are stored separately in the database.</span>
-              </div>
-
-              <div id="ig-draft-feedback" class="ig-draft-feedback" role="status" aria-live="polite">Paste your question blocks to begin.</div>
-
-              <div id="ig-draft-preview" class="ig-draft-preview" hidden>
-                <div class="ig-draft-preview-heading">
-                  <div><h4>Review extracted questions</h4><p>Edit any field before saving.</p></div>
-                  <span id="ig-draft-summary" class="ig-draft-summary"></span>
-                </div>
-                <div id="ig-draft-preview-list" class="ig-draft-preview-list"></div>
-                <button type="button" class="button button-dark ig-save-drafts" id="ig-save-drafts" disabled>Save Valid Questions to Database</button>
-                <p class="ig-save-note">Question IDs and serial numbers are generated by the Worker. They are never generated in the browser.</p>
-              </div>
-            </section>
-
-            <!-- STEP 02: SELECT SAVED QUESTIONS -->
-            <div class="ig-builder-grid">
-              <section class="ig-builder-card">
-                <div class="ig-card-heading">
-                  <div>
-                    <p class="eyebrow">STEP 02</p>
-                    <h3>Select Saved Questions</h3>
-                    <p>Choose existing database questions or use the questions saved above.</p>
-                  </div>
-                  <span class="ig-selected-count" id="ig-selected-count">0 selected</span>
-                </div>
-
-                <div class="ig-filter-grid">
-                  <div class="field-group">
-                    <label for="ig-subject-filter">Subject</label>
-                    <select id="ig-subject-filter"><option value="">Select Subject</option></select>
-                  </div>
-                  <div class="field-group">
-                    <label for="ig-topic-filter">Topic</label>
-                    <select id="ig-topic-filter" disabled><option value="">Select Topic</option></select>
-                  </div>
-                  <div class="field-group">
-                    <label for="ig-type-filter">Question Type</label>
-                    <select id="ig-type-filter">
-                      <option value="">All Types</option>
-                      <option value="MCQ">MCQ</option>
-                      <option value="QA">Question &amp; Answer</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="ig-search-row">
-                  <input type="search" id="ig-search" placeholder="Search questions or Question IDs...">
-                  <button type="button" class="button button-dark" id="ig-load-questions">Load Questions</button>
-                </div>
-
-                <div class="ig-selection-toolbar">
-                  <label class="check-row"><input type="checkbox" id="ig-select-all"><span>Select all visible</span></label>
-                  <button type="button" class="ig-clear-button" id="ig-clear-selection">Clear selection</button>
-                </div>
-
-                <div class="ig-question-list" id="ig-question-list">
-                  <div class="empty-state">
-                    <div class="empty-state-icon">Q</div>
-                    <strong>No questions loaded</strong>
-                    <p>Select a subject and topic, then load database questions. Newly saved drafts are also added here.</p>
-                  </div>
-                </div>
-                <div class="ig-selection-footer">
-                  <span id="ig-selection-summary">No questions selected</span>
-                  <button type="button" class="button button-dark" id="ig-continue" disabled>Continue to Settings</button>
-                </div>
-              </section>
-
-              <!-- STEP 03: IMAGE SETTINGS -->
-              <section class="ig-builder-card" id="ig-settings">
-                <div class="ig-card-heading">
-                  <div>
-                    <p class="eyebrow">STEP 03</p>
-                    <h3>Image Settings</h3>
-                    <p>Configure the output format without changing the locked master design.</p>
-                  </div>
-                </div>
-
-                <div class="ig-settings-fields">
-                  <div class="field-group">
-                    <label for="ig-image-ratio">Aspect Ratio</label>
-                    <select id="ig-image-ratio">
-                      <option value="4:5">4:5 — Master Layout</option>
-                      <option value="1:1">1:1 — Square</option>
-                      <option value="4:3">4:3 — Landscape</option>
-                      <option value="9:16">9:16 — Portrait</option>
-                      <option value="16:9">16:9 — Widescreen</option>
-                    </select>
-                  </div>
-                  <div class="field-group">
-                    <label for="ig-layout-format">Content Layout</label>
-                    <select id="ig-layout-format">
-                      <option value="auto">Automatic by Question Type</option>
-                      <option value="qa">Q&amp;A Format</option>
-                      <option value="mcq">MCQ Format</option>
-                    </select>
-                  </div>
-                  <div class="field-group">
-                    <label for="ig-image-title">Image Heading</label>
-                    <input type="text" id="ig-image-title" maxlength="100" placeholder="Subject or topic name">
-                  </div>
-                  <div class="field-group">
-                    <label for="ig-brand-name">Brand Name</label>
-                    <input type="text" id="ig-brand-name" value="preparekora" maxlength="40">
-                  </div>
-                  <div class="field-group">
-                    <label for="ig-qr-url">QR Destination URL</label>
-                    <input type="url" id="ig-qr-url" placeholder="https://example.com">
-                  </div>
-                </div>
-
-                <div class="ig-options">
-                  <label class="check-row"><input type="checkbox" id="ig-include-explanations" checked><span>Include explanations</span></label>
-                  <label class="check-row"><input type="checkbox" id="ig-highlight-correct" checked><span>Highlight correct MCQ option</span></label>
-                  <label class="check-row"><input type="checkbox" id="ig-page-numbers" checked><span>Show page numbers</span></label>
-                  <label class="check-row"><input type="checkbox" id="ig-include-qr" checked><span>Include QR when URL is provided</span></label>
-                </div>
-
-                <div class="ig-master-note">
-                  <strong>Master Design Protected</strong>
-                  <p>Inter + Noto Sans Assamese, original typography, frame spacing, header, footer, Q&amp;A and MCQ visual formats remain the reference.</p>
-                </div>
-
-                <button type="button" class="button button-dark ig-generate-button" id="ig-generate" disabled>Generate Images</button>
-                <p class="ig-generate-hint" id="ig-generate-hint">Select questions to prepare image generation.</p>
-              </section>
-            </div>
-
-            <!-- STEP 04: PREVIEW AND EXPORT -->
-            <section class="ig-preview-card">
-              <div class="ig-card-heading ig-preview-header">
-                <div>
-                  <p class="eyebrow">STEP 04</p>
-                  <h3>Generated Images</h3>
-                  <p>Preview, reorder and export generated pages.</p>
-                </div>
-                <button type="button" class="button button-dark" id="ig-export-all" disabled>Export All Images</button>
-              </div>
-              <div class="ig-generated-pages" id="ig-generated-pages">
-                <div class="empty-state">
-                  <div class="empty-state-icon">IMG</div>
-                  <strong>No generated images yet</strong>
-                  <p>Generated pages will appear here after the image renderer is connected.</p>
-                </div>
-              </div>
-            </section>
-          </section>
-
-          <!-- GENERATION HISTORY -->
-          <section class="section-block lower-section" id="history" aria-labelledby="recent-title">
-            <div class="section-heading">
-              <div><p class="eyebrow">YOUR CONTENT</p><h2 id="recent-title">Generation history</h2></div>
-              <a class="subtle-link" href="#image-generator">Create images <span aria-hidden="true">→</span></a>
-            </div>
-            <div class="empty-state">
-              <div class="empty-state-icon"><span class="icon-clock" aria-hidden="true"></span></div>
-              <strong>No exported images yet</strong>
-              <p>Your generated image records will appear here once export history is connected.</p>
-            </div>
-          </section>
-
-          <footer class="workspace-footer">
-            <span>PREPAREKORA</span>
-            <span>Private by design</span>
-          </footer>
+      <section class="panel reveal-once" id="imageSettings">
+        <div class="panel-heading"><div><p class="eyebrow">02 · IMAGE CONTROLS</p><h2>Image settings</h2><p class="muted">One design system, adjusted to the selected canvas ratio.</p></div></div>
+        <div class="form-grid three-col">
+          <label class="field"><span>Aspect ratio</span><select id="ratioSelect"><option value="4:5">4:5 · 1080 × 1350</option><option value="1:1">1:1 · 1080 × 1080</option><option value="4:3">4:3 · 1440 × 1080</option><option value="9:16">9:16 · 1080 × 1920</option><option value="16:9">16:9 · 1920 × 1080</option></select></label>
+          <label class="field"><span>Image heading</span><input id="imageHeading" type="text" maxlength="100" placeholder="Defaults to selected topic"></label>
+          <label class="field"><span>Brand name</span><input id="brandName" type="text" maxlength="40" value="preparekora"></label>
         </div>
-      </main>
-    </div>
-  </section>
+        <div class="settings-grid">
+          <div class="setting-block"><div class="setting-heading"><div><strong>Image background</strong><span>Choose one of 10 presets or a custom colour.</span></div><output id="backgroundValue">#FAFBFC</output></div><div class="swatches" id="backgroundSwatches" aria-label="Background colour presets"></div><label class="custom-colour"><span>Custom colour</span><input id="customBackground" type="color" value="#fafbfc"></label></div>
+          <div class="setting-block"><div class="setting-heading"><div><strong>Outer corner radius</strong><span>Controls the image's four outer corners.</span></div><output id="radiusValue">8 px</output></div><input id="radiusRange" class="range-control" type="range" min="0" max="32" step="1" value="8"></div>
+          <div class="setting-block"><div class="setting-heading"><div><strong>QR code URL</strong><span>A real scannable QR is generated when a valid URL is entered.</span></div></div><input id="qrUrl" class="text-control" type="url" placeholder="https://your-website.com"></div>
+        </div>
+        <div class="action-row generate-row"><button class="button button-dark button-large" id="generateButton" type="button" disabled>Generate images</button><span class="muted" id="generateHint">Parse valid questions and select a subject and topic first.</span></div>
+      </section>
 
-  <!-- EXISTING DATABASE QUESTION SELECTOR -->
-  <script src="preimg.js"></script>
+      <section class="panel reveal-once" id="previewSection">
+        <div class="panel-heading preview-panel-heading"><div><p class="eyebrow">03 · PREVIEW &amp; DOWNLOAD</p><h2>Generated pages</h2><p class="muted" id="generatedSummary">Your image previews will appear here.</p></div><div class="download-actions"><button class="button button-dark" id="downloadZipButton" type="button" disabled>Download all as ZIP</button></div></div>
+        <div id="generationFeedback" class="feedback" role="status" aria-live="polite"></div>
+        <div id="generatedPages" class="generated-grid"><div class="empty-preview"><strong>No images generated yet</strong><span>Your pages will appear here after generation.</span></div></div>
+      </section>
 
-  <!-- LOGIN AND SESSION HANDLING -->
-  <script>
-    (() => {
-      "use strict";
-      const API = "https://preparekora-studio-api.yadavsubba2003.workers.dev";
-      const form = document.getElementById("login-form");
-      const button = document.getElementById("login-submit");
-      const feedback = document.getElementById("login-feedback");
+      <section class="panel history-panel reveal-once" id="generationHistory">
+        <div class="panel-heading"><div><p class="eyebrow">SAVED IN FIREBASE</p><h2>Recent image IDs</h2><p class="muted">Subject-wise image generation records from Realtime Database.</p></div><button class="button button-light button-small" id="refreshHistoryButton" type="button">Refresh</button></div>
+        <div id="historyList" class="history-list"><span class="muted">Select a subject to view recent image IDs.</span></div>
+      </section>
+      <footer class="workspace-footer"><span>PREPAREKORA STUDIO</span><span>Private · Admin only</span></footer>
+    </main>
+  </div>
 
-      form.addEventListener("submit", async event => {
-        event.preventDefault();
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-
-        button.disabled = true;
-        button.textContent = "Signing in...";
-        feedback.textContent = "Verifying your account...";
-
-        try {
-          const loginResponse = await fetch(`${API}/api/auth/login`, {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
-          });
-          const loginData = await loginResponse.json();
-          if (!loginResponse.ok || !loginData.success) {
-            throw new Error(loginData.error || "Login failed.");
-          }
-
-          const sessionResponse = await fetch(`${API}/api/auth/session`, {
-            method: "GET",
-            credentials: "include",
-            cache: "no-store"
-          });
-          const sessionData = await sessionResponse.json();
-          if (!sessionResponse.ok || !sessionData.success || !sessionData.user) {
-            throw new Error(sessionData.error || "Session verification failed.");
-          }
-
-          const user = sessionData.user;
-          document.querySelector(".user-menu-copy strong").textContent = user.email || "Account";
-          document.querySelector(".user-menu-copy small").textContent = user.role === "admin" ? "Administrator" : "Workspace user";
-          document.querySelector(".user-avatar").textContent = (user.email || "U").charAt(0).toUpperCase();
-
-          document.getElementById("dashboard-preview").checked = true;
-          window.dispatchEvent(new Event("preparekora:authenticated"));
-          window.scrollTo({ top: 0, behavior: "instant" });
-        } catch (error) {
-          feedback.textContent = error.message || "Unable to connect. Please try again.";
-        } finally {
-          button.disabled = false;
-          button.textContent = "Sign in";
-        }
-      });
-    })();
-  </script>
-
-  <!-- SMART DRAFT PARSER AND DATABASE SAVE -->
-  <script>
-    (() => {
-      "use strict";
-      const API = "https://preparekora-studio-api.yadavsubba2003.workers.dev";
-      const $ = id => document.getElementById(id);
-      const el = {
-        mode: $("ig-draft-mode"), input: $("ig-draft-input"), parse: $("ig-parse-drafts"),
-        clear: $("ig-clear-drafts"), feedback: $("ig-draft-feedback"), preview: $("ig-draft-preview"),
-        previewList: $("ig-draft-preview-list"), summary: $("ig-draft-summary"), save: $("ig-save-drafts"),
-        subject: $("ig-subject-filter"), topic: $("ig-topic-filter"), typeFilter: $("ig-type-filter"),
-        selectedCount: $("ig-selected-count"),
-        generate: $("ig-generate"), continueButton: $("ig-continue"),
-        selectionSummary: $("ig-selection-summary"), generateHint: $("ig-generate-hint")
-      };
-      const drafts = [];
-      let saving = false;
-
-      function feedback(message, type = "") {
-        el.feedback.textContent = message;
-        el.feedback.className = `ig-draft-feedback ${type}`.trim();
-      }
-
-      function splitBilingual(value) {
-        const text = String(value || "").trim();
-        const opening = text.lastIndexOf(" (");
-        if (opening > 0 && text.endsWith(")")) {
-          return { en: text.slice(0, opening).trim(), as: text.slice(opening + 2, -1).trim() };
-        }
-        return { en: text, as: "" };
-      }
-
-      function splitBlocks(source) {
-        const normalized = source.replace(/\r/g, "").trim();
-        if (!normalized) return [];
-        const lines = normalized.split("\n");
-        const starts = [];
-        lines.forEach((line, index) => {
-          if (/^\s*Q\s*:/i.test(line)) starts.push(index);
-        });
-        if (!starts.length) return [normalized];
-        return starts.map((lineIndex, i) => {
-          const endLine = starts[i + 1] ?? lines.length;
-          return lines.slice(lineIndex, endLine).join("\n").replace(/^\s*-{3,}\s*$/gm, "").trim();
-        }).filter(Boolean);
-      }
-
-      function parseBlock(source, index) {
-        const raw = { question: "", answer: "", explanation: "", options: { A: "", B: "", C: "", D: "" } };
-        let current = "";
-        source.replace(/\r/g, "").split("\n").forEach(line => {
-          const value = line.trim();
-          if (!value || /^-{3,}$/.test(value)) return;
-          let match;
-          if ((match = value.match(/^Q\s*:\s*(.*)$/i))) { raw.question = match[1]; current = "question"; return; }
-          if ((match = value.match(/^([A-D])\s*[\)\].:\-]\s*(.*)$/i))) { const key = match[1].toUpperCase(); raw.options[key] = match[2]; current = `option:${key}`; return; }
-          if ((match = value.match(/^(?:Ans|Answer)\s*:\s*(.*)$/i))) { raw.answer = match[1]; current = "answer"; return; }
-          if ((match = value.match(/^Explanation\s*:\s*(.*)$/i))) { raw.explanation = match[1]; current = "explanation"; return; }
-          if (current === "question") raw.question += ` ${value}`;
-          else if (current === "answer") raw.answer += ` ${value}`;
-          else if (current === "explanation") raw.explanation += ` ${value}`;
-          else if (current.startsWith("option:")) { const key = current.split(":")[1]; raw.options[key] += ` ${value}`; }
-        });
-
-        const hasOptions = Object.values(raw.options).some(value => value.trim());
-        const type = el.mode.value === "AUTO" ? (hasOptions ? "MCQ" : "QA") : el.mode.value;
-        const answer = splitBilingual(raw.answer);
-        const draft = {
-          index, type, question: splitBilingual(raw.question), answer,
-          explanation: splitBilingual(raw.explanation),
-          options: Object.fromEntries(["A", "B", "C", "D"].map(key => [key, splitBilingual(raw.options[key])])),
-          correctOption: "", source: raw, saved: false, record: null, saveError: ""
-        };
-        const answerMatch = raw.answer.match(/^\s*(?:OPTION\s*)?([A-D])\s*$/i) || raw.answer.match(/^\s*([A-D])\s*[\).]?\s*$/i);
-        if (answerMatch) draft.correctOption = answerMatch[1].toUpperCase();
-        validateDraft(draft);
-        return draft;
-      }
-
-      function validateDraft(draft) {
-        const errors = [];
-        if (!draft.question.en.trim()) errors.push("English question is required.");
-        if (!draft.question.as.trim()) errors.push("Assamese question translation is required.");
-        if (draft.type === "QA") {
-          if (!draft.answer.en.trim()) errors.push("English answer is required.");
-          if (!draft.answer.as.trim()) errors.push("Assamese answer translation is required.");
-          if ((draft.explanation.en.trim() || draft.explanation.as.trim()) && (!draft.explanation.en.trim() || !draft.explanation.as.trim())) errors.push("Optional explanation must be bilingual or left completely empty.");
-        } else {
-          ["A", "B", "C", "D"].forEach(key => {
-            if (!draft.options[key].en.trim()) errors.push(`Option ${key}: English text is required.`);
-            if (!draft.options[key].as.trim()) errors.push(`Option ${key}: Assamese translation is required.`);
-          });
-          if (!["A", "B", "C", "D"].includes(draft.correctOption)) errors.push("Correct answer must be A, B, C or D.");
-          if (!draft.explanation.en.trim()) errors.push("English explanation is required by the current database API.");
-          if (!draft.explanation.as.trim()) errors.push("Assamese explanation is required by the current database API.");
-        }
-        draft.errors = errors;
-        return errors;
-      }
-
-      function readDraftField(draft, path) {
-        const parts = path.split(".");
-        let value = draft;
-        for (const part of parts) value = value?.[part];
-        return value;
-      }
-
-      function writeDraftField(draft, path, value) {
-        const parts = path.split(".");
-        const last = parts.pop();
-        let target = draft;
-        parts.forEach(part => { target = target[part]; });
-        target[last] = value;
-      }
-
-      function addEditableField(container, draft, path, label, rows = 2) {
-        const wrapper = document.createElement("label");
-        wrapper.className = "ig-edit-field";
-        const caption = document.createElement("span");
-        caption.textContent = label;
-        const textarea = document.createElement("textarea");
-        textarea.rows = rows;
-        textarea.dataset.draftIndex = String(draft.index - 1);
-        textarea.dataset.draftPath = path;
-        textarea.value = readDraftField(draft, path) || "";
-        textarea.setAttribute("aria-label", `Question ${draft.index}: ${label}`);
-        wrapper.append(caption, textarea);
-        container.appendChild(wrapper);
-      }
-
-      function addPreviewText(container, text, className) {
-        const p = document.createElement("p");
-        p.className = className;
-        p.textContent = text;
-        container.appendChild(p);
-      }
-
-      function renderDraftCard(draft) {
-        const card = document.createElement("article");
-        card.className = "ig-parsed-card";
-        card.dataset.draftIndex = String(draft.index - 1);
-
-        const header = document.createElement("div");
-        header.className = "ig-parsed-card-header";
-        const title = document.createElement("strong");
-        title.textContent = `Question ${draft.index} · ${draft.type}`;
-        const badge = document.createElement("span");
-        badge.className = "ig-parsed-status";
-        badge.textContent = draft.saved ? "Saved" : draft.errors.length ? "Needs correction" : "Ready";
-        header.append(title, badge);
-        card.appendChild(header);
-
-        const questionGroup = document.createElement("div");
-        questionGroup.className = "ig-edit-grid";
-        addEditableField(questionGroup, draft, "question.en", "Question — English", 3);
-        addEditableField(questionGroup, draft, "question.as", "Question — Assamese", 3);
-        card.appendChild(questionGroup);
-
-        if (draft.type === "QA") {
-          const answerHeading = document.createElement("h5");
-          answerHeading.textContent = "Answer";
-          card.appendChild(answerHeading);
-          const answerGroup = document.createElement("div");
-          answerGroup.className = "ig-edit-grid";
-          addEditableField(answerGroup, draft, "answer.en", "Answer — English");
-          addEditableField(answerGroup, draft, "answer.as", "Answer — Assamese");
-          card.appendChild(answerGroup);
-        } else {
-          const optionsHeading = document.createElement("h5");
-          optionsHeading.textContent = "Options";
-          card.appendChild(optionsHeading);
-          const optionsGroup = document.createElement("div");
-          optionsGroup.className = "ig-edit-grid";
-          ["A", "B", "C", "D"].forEach(key => {
-            addEditableField(optionsGroup, draft, `options.${key}.en`, `Option ${key} — English`);
-            addEditableField(optionsGroup, draft, `options.${key}.as`, `Option ${key} — Assamese`);
-          });
-          card.appendChild(optionsGroup);
-          const correctGroup = document.createElement("div");
-          correctGroup.className = "ig-edit-field ig-correct-answer-field";
-          const correctLabel = document.createElement("label");
-          correctLabel.textContent = "Correct Option";
-          const select = document.createElement("select");
-          select.dataset.draftIndex = String(draft.index - 1);
-          select.dataset.draftPath = "correctOption";
-          ["A", "B", "C", "D"].forEach(key => { const option = document.createElement("option"); option.value = key; option.textContent = `Option ${key}`; select.appendChild(option); });
-          select.value = draft.correctOption;
-          correctGroup.append(correctLabel, select);
-          card.appendChild(correctGroup);
-        }
-
-        const explanationHeading = document.createElement("h5");
-        explanationHeading.textContent = draft.type === "MCQ" ? "Explanation (required for saving)" : "Explanation (optional)";
-        card.appendChild(explanationHeading);
-        const explanationGroup = document.createElement("div");
-        explanationGroup.className = "ig-edit-grid";
-        addEditableField(explanationGroup, draft, "explanation.en", "Explanation — English", 3);
-        addEditableField(explanationGroup, draft, "explanation.as", "Explanation — Assamese", 3);
-        card.appendChild(explanationGroup);
-
-        const errors = document.createElement("ul");
-        errors.className = "ig-parsed-errors";
-        errors.dataset.errorList = "true";
-        draft.errors.forEach(message => { const li = document.createElement("li"); li.textContent = message; errors.appendChild(li); });
-        errors.hidden = !draft.errors.length;
-        card.appendChild(errors);
-
-        if (draft.saved && draft.record) {
-          addPreviewText(card, `Saved Question ID: ${draft.record.id}`, "ig-parsed-saved-id");
-        }
-        if (draft.saveError) addPreviewText(card, draft.saveError, "ig-draft-save-error");
-        return card;
-      }
-
-      function updateDraftSummary() {
-        let ready = 0, invalid = 0, saved = 0;
-        drafts.forEach(draft => {
-          validateDraft(draft);
-          if (draft.saved) saved++;
-          else if (draft.errors.length) invalid++;
-          else ready++;
-        });
-        el.summary.textContent = `${ready} ready · ${invalid} need correction · ${saved} saved`;
-        el.save.disabled = saving || ready === 0;
-        el.save.textContent = saving ? "Saving..." : ready ? `Save ${ready} Valid Questions` : "No Valid Questions to Save";
-      }
-
-      function renderDrafts() {
-        el.preview.hidden = false;
-        el.previewList.replaceChildren();
-        drafts.forEach(draft => el.previewList.appendChild(renderDraftCard(draft)));
-        updateDraftSummary();
-      }
-
-      function parseDrafts() {
-        const blocks = splitBlocks(el.input.value);
-        if (!blocks.length) {
-          feedback("Paste at least one question block first.", "error");
-          return;
-        }
-        drafts.splice(0, drafts.length, ...blocks.map((block, index) => parseBlock(block, index + 1)));
-        renderDrafts();
-        const ready = drafts.filter(draft => !draft.errors.length).length;
-        const invalid = drafts.length - ready;
-        feedback(`${drafts.length} question block(s) detected. ${ready} ready; ${invalid} need correction. Review the fields below before saving.`, invalid ? "error" : "success");
-        el.preview.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
-
-      el.previewList.addEventListener("input", event => {
-        const control = event.target.closest("[data-draft-index][data-draft-path]");
-        if (!control) return;
-        const draft = drafts[Number(control.dataset.draftIndex)];
-        if (!draft || draft.saved) return;
-        writeDraftField(draft, control.dataset.draftPath, control.value);
-        refreshCardValidation(draft, control.closest(".ig-parsed-card"));
-      });
-
-      el.previewList.addEventListener("change", event => {
-        const control = event.target.closest("[data-draft-index][data-draft-path]");
-        if (!control) return;
-        const draft = drafts[Number(control.dataset.draftIndex)];
-        if (!draft || draft.saved) return;
-        writeDraftField(draft, control.dataset.draftPath, control.value);
-        refreshCardValidation(draft, control.closest(".ig-parsed-card"));
-      });
-
-      function refreshCardValidation(draft, card) {
-        validateDraft(draft);
-        const badge = card.querySelector(".ig-parsed-status");
-        badge.textContent = draft.saved ? "Saved" : draft.errors.length ? "Needs correction" : "Ready";
-        const list = card.querySelector('[data-error-list="true"]');
-        list.replaceChildren();
-        draft.errors.forEach(message => { const li = document.createElement("li"); li.textContent = message; list.appendChild(li); });
-        list.hidden = !draft.errors.length;
-        updateDraftSummary();
-      }
-
-      async function saveDrafts() {
-        if (saving) return;
-        if (!el.subject.value || !el.topic.value) {
-          feedback("Select an active Subject and Topic in Step 02 before saving drafts.", "error");
-          document.getElementById("ig-subject-filter").scrollIntoView({ behavior: "smooth", block: "center" });
-          return;
-        }
-
-        const pending = drafts.filter(draft => !draft.saved && !validateDraft(draft).length);
-        if (!pending.length) {
-          feedback("No valid unsaved questions are ready.", "error");
-          updateDraftSummary();
-          return;
-        }
-
-        saving = true;
-        updateDraftSummary();
-        let succeeded = 0;
-        let failed = 0;
-
-        for (const draft of pending) {
-          const payload = {
-            type: draft.type,
-            subjectCode: el.subject.value,
-            topicCode: el.topic.value,
-            question: draft.question
-          };
-          if (draft.type === "MCQ") {
-            payload.options = draft.options;
-            payload.correctOption = draft.correctOption;
-            payload.explanation = draft.explanation;
-          } else {
-            payload.answer = draft.answer;
-            if (draft.explanation.en.trim() && draft.explanation.as.trim()) payload.explanation = draft.explanation;
-          }
-
-          try {
-            const response = await fetch(`${API}/api/admin/questions`, {
-              method: "POST",
-              credentials: "include",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload)
-            });
-            let result;
-            try { result = await response.json(); } catch { throw new Error("Invalid server response."); }
-            if (!response.ok || !result.success || !result.question) throw new Error(result.error || `Save failed (${response.status}).`);
-            draft.saved = true;
-            draft.record = result.question;
-            draft.saveError = "";
-            succeeded++;
-          } catch (error) {
-            draft.saveError = error.message || "Question save failed.";
-            failed++;
-          }
-          renderDrafts();
-        }
-
-        saving = false;
-        updateDraftSummary();
-
-        const savedRecords = drafts.filter(draft => draft.saved && draft.record).map(draft => draft.record);
-        if (savedRecords.length && window.prepareKoraImageWorkspace?.addSelectedQuestions) {
-          window.prepareKoraImageWorkspace.addSelectedQuestions(savedRecords);
-        }
-
-        if (succeeded && !failed) feedback(`${succeeded} question(s) saved. Permanent Question IDs were generated and the records were added to your image selection.`, "success");
-        else if (succeeded) feedback(`${succeeded} saved; ${failed} failed. Review the individual save errors before retrying.`, "error");
-        else feedback(`No questions saved. ${failed} error(s) need attention.`, "error");
-      }
-
-      el.parse.addEventListener("click", parseDrafts);
-      el.save.addEventListener("click", saveDrafts);
-      el.clear.addEventListener("click", () => {
-        el.input.value = "";
-        drafts.splice(0, drafts.length);
-        el.preview.hidden = true;
-        el.previewList.replaceChildren();
-        el.save.disabled = true;
-        el.summary.textContent = "";
-        feedback("Draft input cleared.");
-      });
-      el.input.addEventListener("input", () => {
-        if (drafts.length) {
-          drafts.splice(0, drafts.length);
-          el.preview.hidden = true;
-          el.previewList.replaceChildren();
-          el.save.disabled = true;
-          feedback("Draft changed. Parse again to refresh the review.");
-        }
-      });
-
-      document.querySelectorAll("[data-ig-mode]").forEach(link => {
-        link.addEventListener("click", () => {
-          const mode = link.dataset.igMode;
-          if (!["QA", "MCQ"].includes(mode)) return;
-          el.mode.value = mode;
-          el.typeFilter.value = mode;
-          setTimeout(() => {
-            el.input.scrollIntoView({ behavior: "smooth", block: "center" });
-            el.input.focus({ preventScroll: true });
-          }, 120);
-        });
-      });
-
-      el.continueButton.addEventListener("click", () => {
-        document.getElementById("ig-settings").scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-
-      // Keep Generate disabled until the actual image renderer is connected.
-      // The Continue button remains functional when questions are selected.
-      function updateGenerationAvailability() {
-        const count = window.prepareKoraImageWorkspace?.getSelectedQuestions?.().length || 0;
-        el.generate.disabled = true;
-        el.continueButton.disabled = count === 0;
-        el.selectionSummary.textContent = count ? `${count} question(s) selected for image generation` : "No questions selected";
-        el.generateHint.textContent = count ? "Your selection is ready. Image rendering and pagination are the next module." : "Select or save questions to continue.";
-      }
-
-      if (el.selectedCount) {
-        const selectionObserver = new MutationObserver(updateGenerationAvailability);
-        selectionObserver.observe(el.selectedCount, { childList: true, characterData: true, subtree: true });
-      }
-      updateGenerationAvailability();
-    })();
-  </script>
+  <dialog class="catalog-dialog" id="catalogDialog">
+    <form id="catalogForm" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow" id="catalogEyebrow">CATALOG MANAGEMENT</p><h2 id="catalogTitle">Add subject</h2></div><button class="icon-button" id="closeCatalogDialog" type="button" aria-label="Close">×</button></div>
+      <label class="field" id="catalogCodeGroup"><span>Subject code</span><input id="catalogCode" type="text" maxlength="12" placeholder="e.g. GK" autocomplete="off"></label>
+      <label class="field"><span id="catalogNameLabel">Subject name</span><input id="catalogName" type="text" maxlength="80" required placeholder="e.g. General Knowledge"></label>
+      <label class="field"><span>Description (optional)</span><textarea id="catalogDescription" rows="3" maxlength="300" placeholder="Short description"></textarea></label>
+      <p class="feedback" id="catalogFeedback" role="status"></p>
+      <div class="dialog-actions"><button class="button button-light" id="cancelCatalogButton" type="button">Cancel</button><button class="button button-dark" id="saveCatalogButton" type="submit">Save</button></div>
+    </form>
+  </dialog>
 </body>
 </html>
