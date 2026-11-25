@@ -41,7 +41,7 @@
 
     <main class="workspace" id="workspace">
       <section class="page-intro reveal-once">
-        <div><p class="eyebrow">QUESTION TO IMAGE</p><h1>Image workspace</h1><p class="muted">Paste your bilingual questions, preview the layout, then download each page or all pages together.</p></div>
+        <div><p class="eyebrow">QUESTION TO IMAGE</p><h1>Image workspace</h1><p class="muted">Paste your bilingual questions. The preview updates automatically; then download pages individually or together.</p></div>
         <span class="private-label"><span></span> Private workspace</span>
       </section>
 
@@ -55,8 +55,8 @@
         <div class="draft-heading"><div><h2>Paste question drafts</h2><p class="muted">English and Assamese must stay together as <code>English text (অসমীয়া অনুবাদ)</code>.</p></div><button class="text-button" type="button" id="copyFormatButton">Copy input format</button></div>
         <div class="format-tip"><strong>MCQ format</strong><code>Q: Question (প্ৰশ্ন)<br>A) Option A (বিকল্প)<br>B) Option B (বিকল্প)<br>C) Option C (বিকল্প)<br>D) Option D (বিকল্প)<br>Ans: C<br>Explanation: Optional explanation (ঐচ্ছিক ব্যাখ্যা)</code><span>For Q&amp;A, use <code>Q:</code> and <code>Ans:</code>. Separate questions with <code>---</code> or start the next block with another <code>Q:</code>.</span></div>
         <label class="field"><span>Question input</span><textarea id="draftInput" rows="11" spellcheck="false" placeholder="Q: Which ministry lays and maintains the national highways of India? (ভাৰতৰ ৰাষ্ট্ৰীয় ঘাইপথ কোনটো মন্ত্ৰালয়ে নিৰ্মাণ আৰু ৰক্ষণাবেক্ষণ কৰে?)&#10;A) Ministry of Railways (ৰেল মন্ত্ৰালয়)&#10;B) Ministry of Home Affairs (গৃহ পৰিক্ৰমা মন্ত্ৰালয়)&#10;C) Ministry of Road Transport and Highways (সড়ক পৰিবহণ আৰু ঘাইপথ মন্ত্ৰালয়)&#10;D) Ministry of Rural Development (গ্ৰাম্য উন্নয়ন মন্ত্ৰালয়)&#10;Ans: C&#10;---"></textarea></label>
-        <div class="action-row"><button class="button button-dark" id="previewButton" type="button">Parse &amp; preview questions</button><button class="button button-light" id="clearButton" type="button">Clear input</button><span class="feedback" id="draftFeedback" role="status" aria-live="polite"></span></div>
-        <div id="parsedArea" class="parsed-area" hidden><div class="parsed-top"><div><h3>Question review</h3><p class="muted" id="parsedSummary"></p></div><button class="button button-light button-small" id="reparseButton" type="button">Parse again</button></div><div id="parsedList" class="parsed-list"></div></div>
+        <div class="action-row"><button class="button button-light" id="clearButton" type="button">Clear input</button><span class="feedback" id="draftFeedback" role="status" aria-live="polite">Preview updates automatically as you type or paste.</span></div>
+        <div id="parsedArea" class="parsed-area" hidden><div class="parsed-top"><div><h3>Live question preview</h3><p class="muted" id="parsedSummary"></p></div></div><div id="parsedList" class="parsed-list"></div></div>
       </section>
 
       <section class="panel reveal-once" id="imageSettings">
@@ -71,7 +71,7 @@
           <div class="setting-block"><div class="setting-heading"><div><strong>Outer corner radius</strong><span>Controls the image's four outer corners.</span></div><output id="radiusValue">8 px</output></div><input id="radiusRange" class="range-control" type="range" min="0" max="32" step="1" value="8"></div>
           <div class="setting-block"><div class="setting-heading"><div><strong>QR code URL</strong><span>A real scannable QR is generated when a valid URL is entered.</span></div></div><input id="qrUrl" class="text-control" type="url" placeholder="https://your-website.com"></div>
         </div>
-        <div class="action-row generate-row"><button class="button button-dark button-large" id="generateButton" type="button" disabled>Generate images</button><span class="muted" id="generateHint">Parse valid questions and select a subject and topic first.</span></div>
+        <div class="action-row generate-row"><button class="button button-dark button-large" id="generateButton" type="button" disabled>Generate images</button><span class="muted" id="generateHint">Paste valid bilingual questions and select a subject and topic first.</span></div>
       </section>
 
       <section class="panel reveal-once" id="previewSection">
