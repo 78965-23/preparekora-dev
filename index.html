@@ -8,7 +8,7 @@
   <title>Preparekora — Workspace</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Assamese:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -480,7 +480,8 @@
           document.querySelector(".user-avatar").textContent =
             (user.email || "U").charAt(0).toUpperCase();
 
-          document.getElementById("dashboard-preview").checked = true;
+document.getElementById("dashboard-preview").checked = true;
+window.dispatchEvent(new Event("preparekora:authenticated"));
           window.scrollTo({ top: 0, behavior: "instant" });
 
         } catch (error) {
@@ -493,6 +494,8 @@
       });
     })();
   </script>
+  <script src="preimg.js"></script>
+
 </body>
 </html>
 
