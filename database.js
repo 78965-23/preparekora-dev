@@ -644,24 +644,15 @@ function buildCsv(records) {
       topic?.name || "",
 
       question.en,
-      question.as,
-
       answer.en,
-      answer.as,
 
       options.A?.en,
-      options.A?.as,
       options.B?.en,
-      options.B?.as,
       options.C?.en,
-      options.C?.as,
       options.D?.en,
-      options.D?.as,
 
       record.correctOption,
-
       explanation.en,
-      explanation.as,
 
       record.active === false ? "Inactive" : "Active",
 
