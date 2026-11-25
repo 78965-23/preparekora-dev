@@ -503,9 +503,17 @@ function createRecordRow(record) {
     editButton.dataset.questionId = record.id;
 
     actionCell.appendChild(editButton);
-  } else {
-    actionCell.textContent = "Inactive";
   }
+
+  const historyButton = document.createElement("button");
+
+  historyButton.type = "button";
+  historyButton.className = "btn btn-secondary table-action";
+  historyButton.textContent = "History";
+  historyButton.dataset.action = "history";
+  historyButton.dataset.questionId = record.id;
+
+  actionCell.appendChild(historyButton);
 
   row.appendChild(actionCell);
 
@@ -797,17 +805,318 @@ editDialog.querySelector("#closeEditDialog")
 editDialog.querySelector("#cancelEdit")
   .addEventListener("click", closeEditDialog);
 
+/* =========================================
+   VERSION HISTORY VIEWER
+   ========================================= */
 
-/* Table action handling */
+const versionHistoryDialog = document.createElement("dialog");
+
+versionHistoryDialog.className = "record-dialog";
+
+versionHistoryDialog.innerHTML = `
+  <div class="record-dialog-header">
+    <div>
+      <span class="eyebrow">CONTENT MANAGEMENT</span>
+      <h2>Version History</h2>
+      <p id="versionHistoryRecordId"></p>
+    </div>
+
+    <button
+      type="button"
+      id="closeVersionHistory"
+      class="icon-button"
+      aria-label="Close"
+    >×</button>
+  </div>
+
+  <div id="versionHistoryContent" class="edit-fields"></div>
+
+  <div class="record-dialog-actions">
+    <button
+      type="button"
+      id="closeVersionHistoryFooter"
+      class="btn btn-secondary"
+    >Close</button>
+  </div>
+`;
+
+document.body.appendChild(versionHistoryDialog);
+
+const versionHistoryContent =
+  versionHistoryDialog.querySelector("#versionHistoryContent");
+
+
+function formatDateTime(timestamp) {
+  if (!timestamp) return "—";
+
+  const date = new Date(timestamp);
+
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone: INDIA_TIMEZONE,
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  }).format(date);
+}
+
+
+function appendHistoryPair(container, label, value) {
+  const group = document.createElement("div");
+  group.className = "edit-field-group";
+
+  const heading = document.createElement("h3");
+  heading.textContent = label;
+
+  const languages = document.createElement("div");
+  languages.className = "edit-language-grid";
+
+  ["en", "as"].forEach(language => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "form-group";
+
+    const languageLabel = document.createElement("label");
+
+    languageLabel.textContent =
+      language === "en" ? "English" : "Assamese";
+
+    const content = document.createElement("p");
+
+    content.textContent =
+      value?.[language] || "—";
+
+    content.style.whiteSpace = "pre-wrap";
+    content.style.overflowWrap = "anywhere";
+    content.style.margin = "6px 0 0";
+    content.style.padding = "10px";
+    content.style.border = "1px solid #dfe3e8";
+    content.style.borderRadius = "8px";
+
+    wrapper.append(languageLabel, content);
+    languages.appendChild(wrapper);
+  });
+
+  group.append(heading, languages);
+  container.appendChild(group);
+}
+
+
+function appendHistoryValue(container, label, value) {
+  const group = document.createElement("div");
+  group.className = "edit-field-group";
+
+  const heading = document.createElement("h3");
+  heading.textContent = label;
+
+  const content = document.createElement("p");
+
+  content.textContent = value || "—";
+  content.style.margin = "8px 0 0";
+
+  group.append(heading, content);
+  container.appendChild(group);
+}
+
+
+function renderVersionEntry(entry) {
+  const snapshot = entry.record;
+
+  const section = document.createElement("section");
+  section.className = "edit-field-group";
+
+  const header = document.createElement("div");
+
+  header.style.display = "flex";
+  header.style.alignItems = "center";
+  header.style.justifyContent = "space-between";
+  header.style.flexWrap = "wrap";
+  header.style.gap = "10px";
+
+  const heading = document.createElement("h3");
+
+  heading.textContent = entry.current
+    ? `Current Version — ${entry.version}`
+    : `Version ${entry.version}`;
+
+  header.appendChild(heading);
+
+  if (entry.current) {
+    const badge = document.createElement("span");
+
+    badge.className = "status-badge active";
+    badge.textContent = "Current";
+
+    header.appendChild(badge);
+  }
+
+  section.appendChild(header);
+
+  const metadata = document.createElement("p");
+
+  metadata.textContent =
+    `Recorded: ${formatDateTime(entry.savedAt)} | Admin UID: ${entry.savedBy || "—"}`;
+
+  metadata.style.fontSize = "13px";
+  metadata.style.color = "#737b88";
+  metadata.style.overflowWrap = "anywhere";
+  metadata.style.margin = "8px 0 16px";
+
+  section.appendChild(metadata);
+
+  appendHistoryPair(
+    section,
+    "Question",
+    snapshot.question
+  );
+
+  if (snapshot.type === "QA") {
+    appendHistoryPair(
+      section,
+      "Answer",
+      snapshot.answer
+    );
+  }
+
+  if (snapshot.type === "MCQ") {
+    ["A", "B", "C", "D"].forEach(letter => {
+      appendHistoryPair(
+        section,
+        `Option ${letter}`,
+        snapshot.options?.[letter]
+      );
+    });
+
+    appendHistoryValue(
+      section,
+      "Correct Option",
+      snapshot.correctOption
+    );
+  }
+
+  if (snapshot.explanation) {
+    appendHistoryPair(
+      section,
+      "Explanation",
+      snapshot.explanation
+    );
+  }
+
+  versionHistoryContent.appendChild(section);
+}
+
+
+function openVersionHistoryDialog(questionId) {
+  const record = state.allRecords.find(
+    item => item.id === questionId
+  );
+
+  if (!record) {
+    showMessage("error", "Question record not found.");
+    return;
+  }
+
+  versionHistoryContent.replaceChildren();
+
+  document.getElementById(
+    "versionHistoryRecordId"
+  ).textContent = record.id;
+
+  const history = record.versionHistory &&
+    typeof record.versionHistory === "object"
+      ? record.versionHistory
+      : {};
+
+  const currentVersion = Number(record.version || 1);
+
+  const entries = Object.entries(history)
+    .filter(([, entry]) =>
+      entry &&
+      entry.record &&
+      typeof entry.record === "object"
+    )
+    .map(([key, entry]) => ({
+      version: Number(
+        entry.version ||
+        entry.record.version ||
+        key.replace(/\D/g, "")
+      ),
+      savedAt: entry.savedAt ||
+        entry.record.updatedAt ||
+        entry.record.createdAt,
+      savedBy: entry.savedBy ||
+        entry.record.updatedBy ||
+        entry.record.createdBy,
+      record: entry.record,
+      current: false
+    }))
+    .filter(entry =>
+      Number.isFinite(entry.version) &&
+      entry.version > 0 &&
+      entry.version < currentVersion
+    )
+    .sort((a, b) => a.version - b.version);
+
+  // Add the latest live record.
+  entries.push({
+    version: currentVersion,
+    savedAt: record.updatedAt || record.createdAt,
+    savedBy: record.updatedBy || record.createdBy,
+    record: record,
+    current: true
+  });
+
+  entries.forEach(renderVersionEntry);
+
+  if (entries.length === 1) {
+    const note = document.createElement("p");
+
+    note.textContent =
+      "No previous versions are available for this question.";
+
+    versionHistoryContent.prepend(note);
+  }
+
+  versionHistoryDialog.showModal();
+}
+
+
+function closeVersionHistoryDialog() {
+  versionHistoryDialog.close();
+}
+
+
+versionHistoryDialog
+  .querySelector("#closeVersionHistory")
+  .addEventListener("click", closeVersionHistoryDialog);
+
+versionHistoryDialog
+  .querySelector("#closeVersionHistoryFooter")
+  .addEventListener("click", closeVersionHistoryDialog);
+
+/* =========================================
+   TABLE ACTION HANDLING
+   ========================================= */
 
 elements.tableBody.addEventListener("click", event => {
-  const button = event.target.closest(
-    '[data-action="edit"]'
-  );
+  const button = event.target.closest("[data-action]");
 
   if (!button) return;
 
-  openEditDialog(button.dataset.questionId);
+  const questionId = button.dataset.questionId;
+
+  if (button.dataset.action === "edit") {
+    openEditDialog(questionId);
+    return;
+  }
+
+  if (button.dataset.action === "history") {
+    openVersionHistoryDialog(questionId);
+  }
 });
 
 
