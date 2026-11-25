@@ -490,17 +490,326 @@ function createRecordRow(record) {
   statusCell.appendChild(statusBadge);
   row.appendChild(statusCell);
 
-  // Actions will be connected in a later stage.
-  row.appendChild(createCell("—"));
+  // Administrative actions
+  const actionCell = document.createElement("td");
+
+  if (active) {
+    const editButton = document.createElement("button");
+
+    editButton.type = "button";
+    editButton.className = "btn btn-secondary table-action";
+    editButton.textContent = "Edit";
+    editButton.dataset.action = "edit";
+    editButton.dataset.questionId = record.id;
+
+    actionCell.appendChild(editButton);
+  } else {
+    actionCell.textContent = "Inactive";
+  }
+
+  row.appendChild(actionCell);
 
   return row;
 }
+
 
 function createCell(value) {
   const cell = document.createElement("td");
   cell.textContent = value;
   return cell;
 }
+
+/* =========================================
+   QUESTION EDIT DIALOG
+   ========================================= */
+
+const editDialog = document.createElement("dialog");
+
+editDialog.className = "record-dialog";
+
+editDialog.innerHTML = `
+  <div class="record-dialog-header">
+    <div>
+      <span class="eyebrow">CONTENT MANAGEMENT</span>
+      <h2>Edit Question</h2>
+      <p id="editRecordId"></p>
+    </div>
+
+    <button type="button" id="closeEditDialog"
+      class="icon-button" aria-label="Close">×</button>
+  </div>
+
+  <form id="questionEditForm">
+    <div id="editFields" class="edit-fields"></div>
+
+    <div id="editFormMessage"
+      class="edit-form-message"
+      role="alert"></div>
+
+    <div class="record-dialog-actions">
+      <button type="button" id="cancelEdit"
+        class="btn btn-secondary">Cancel</button>
+
+      <button type="submit" id="saveEdit"
+        class="btn btn-primary">Save Changes</button>
+    </div>
+  </form>
+`;
+
+document.body.appendChild(editDialog);
+
+const editForm = editDialog.querySelector("#questionEditForm");
+const editFields = editDialog.querySelector("#editFields");
+const editFormMessage = editDialog.querySelector("#editFormMessage");
+
+let editingRecord = null;
+
+
+/* Create bilingual input fields */
+
+function appendPairEditor(label, path, value = {}, required = true) {
+  const group = document.createElement("div");
+  group.className = "edit-field-group";
+
+  const heading = document.createElement("h3");
+  heading.textContent = label;
+
+  const languages = document.createElement("div");
+  languages.className = "edit-language-grid";
+
+  ["en", "as"].forEach(language => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "form-group";
+
+    const inputLabel = document.createElement("label");
+
+    inputLabel.textContent =
+      language === "en" ? "English" : "Assamese";
+
+    const textarea = document.createElement("textarea");
+
+    textarea.dataset.field = `${path}.${language}`;
+    textarea.value = value[language] || "";
+    textarea.rows = 3;
+    textarea.required = required;
+    textarea.maxLength = path.startsWith("options") ? 2000 : 5000;
+
+    wrapper.append(inputLabel, textarea);
+    languages.appendChild(wrapper);
+  });
+
+  group.append(heading, languages);
+  editFields.appendChild(group);
+}
+
+
+/* Open and populate dialog */
+
+function openEditDialog(questionId) {
+  const record = state.allRecords.find(
+    item => item.id === questionId
+  );
+
+  if (!record) {
+    showMessage("error", "Question record not found.");
+    return;
+  }
+
+  if (record.active === false) {
+    showMessage("error", "Inactive questions cannot be edited.");
+    return;
+  }
+
+  editingRecord = record;
+
+  editFields.replaceChildren();
+  editFormMessage.textContent = "";
+
+  document.getElementById("editRecordId").textContent =
+    record.id;
+
+  appendPairEditor(
+    "Question",
+    "question",
+    record.question
+  );
+
+  if (record.type === "QA") {
+    appendPairEditor(
+      "Answer",
+      "answer",
+      record.answer
+    );
+
+    appendPairEditor(
+      "Explanation (Optional)",
+      "explanation",
+      record.explanation,
+      false
+    );
+  }
+
+  if (record.type === "MCQ") {
+    ["A", "B", "C", "D"].forEach(letter => {
+      appendPairEditor(
+        `Option ${letter}`,
+        `options.${letter}`,
+        record.options?.[letter]
+      );
+    });
+
+    const correctGroup = document.createElement("div");
+    correctGroup.className = "form-group";
+
+    const label = document.createElement("label");
+    label.textContent = "Correct Option";
+
+    const select = document.createElement("select");
+    select.dataset.field = "correctOption";
+
+    ["A", "B", "C", "D"].forEach(letter => {
+      addOption(select, letter, `Option ${letter}`);
+    });
+
+    select.value = record.correctOption || "";
+
+    correctGroup.append(label, select);
+    editFields.appendChild(correctGroup);
+
+    appendPairEditor(
+      "Explanation",
+      "explanation",
+      record.explanation
+    );
+  }
+
+  editDialog.querySelector("#saveEdit").disabled = false;
+
+  editDialog.showModal();
+}
+
+
+/* Read form data safely */
+
+function readEditField(path) {
+  const control = editForm.querySelector(
+    `[data-field="${path}"]`
+  );
+
+  return control ? control.value.trim() : "";
+}
+
+function readEditPair(path) {
+  return {
+    en: readEditField(`${path}.en`),
+    as: readEditField(`${path}.as`)
+  };
+}
+
+
+/* Save edited question through PATCH API */
+
+editForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  if (!editingRecord || !editForm.reportValidity()) {
+    return;
+  }
+
+  const saveButton = editDialog.querySelector("#saveEdit");
+
+  saveButton.disabled = true;
+  saveButton.textContent = "Saving...";
+
+  editFormMessage.textContent = "Updating question...";
+
+  const payload = {
+    id: editingRecord.id,
+    question: readEditPair("question")
+  };
+
+  if (editingRecord.type === "QA") {
+    payload.answer = readEditPair("answer");
+
+    const explanation = readEditPair("explanation");
+
+    payload.explanation =
+      explanation.en && explanation.as
+        ? explanation
+        : null;
+  }
+
+  if (editingRecord.type === "MCQ") {
+    payload.options = {};
+
+    ["A", "B", "C", "D"].forEach(letter => {
+      payload.options[letter] =
+        readEditPair(`options.${letter}`);
+    });
+
+    payload.correctOption = readEditField("correctOption");
+    payload.explanation = readEditPair("explanation");
+  }
+
+  try {
+    const result = await apiRequest(
+      "/api/admin/questions",
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    editDialog.close();
+    editingRecord = null;
+
+    await loadRecords();
+
+    showMessage(
+      "success",
+      `Question updated successfully. Version ${result.question.version}.`
+    );
+
+  } catch (error) {
+    editFormMessage.textContent =
+      error.message || "Question update failed.";
+
+  } finally {
+    saveButton.disabled = false;
+    saveButton.textContent = "Save Changes";
+  }
+});
+
+
+/* Dialog controls */
+
+function closeEditDialog() {
+  editDialog.close();
+  editingRecord = null;
+}
+
+editDialog.querySelector("#closeEditDialog")
+  .addEventListener("click", closeEditDialog);
+
+editDialog.querySelector("#cancelEdit")
+  .addEventListener("click", closeEditDialog);
+
+
+/* Table action handling */
+
+elements.tableBody.addEventListener("click", event => {
+  const button = event.target.closest(
+    '[data-action="edit"]'
+  );
+
+  if (!button) return;
+
+  openEditDialog(button.dataset.questionId);
+});
+
 
 function formatDate(timestamp) {
   if (!timestamp) return "—";
