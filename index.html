@@ -128,7 +128,8 @@
             <span class="nav-icon icon-grid" aria-hidden="true"></span><span>Dashboard</span>
           </a>
           <a class="nav-link" href="#qa-generator"><span class="nav-icon icon-file" aria-hidden="true"></span><span>Q&amp;A Generator</span></a>
-          <a class="nav-link" href="#mcq-generator"><span class="nav-icon icon-list" aria-hidden="true"></span><span>MCQ Generator</span></a>
+<a class="nav-link" href="#mcq-generator"><span class="nav-icon icon-list" aria-hidden="true"></span><span>MCQ Generator</span></a>
+<a class="nav-link" href="#image-generator"><span class="nav-icon icon-file" aria-hidden="true"></span><span>Image Generator</span></a>
         </nav>
 
         <div class="sidebar-section-label sidebar-label-spaced">CONTENT MANAGEMENT</div>
@@ -209,6 +210,211 @@
               <p>Your generated content will appear here after you create your first set.</p>
             </div>
           </section>
+          
+<section class="section-block ig-workspace-section"
+         id="image-generator"
+         aria-labelledby="image-generator-title">
+
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">CONTENT CREATION</p>
+      <h2 id="image-generator-title">Image Generator</h2>
+    </div>
+    <span class="section-note">Bilingual educational images</span>
+  </div>
+
+  <div class="ig-builder-grid">
+
+    <!-- QUESTION SELECTION -->
+    <section class="ig-builder-card">
+      <div class="ig-card-heading">
+        <div>
+          <p class="eyebrow">STEP 01</p>
+          <h3>Select Questions</h3>
+          <p>Choose existing questions from your database.</p>
+        </div>
+        <span class="ig-selected-count" id="ig-selected-count">0 selected</span>
+      </div>
+
+      <div class="ig-filter-grid">
+
+        <div class="field-group">
+          <label for="ig-subject-filter">Subject</label>
+          <select id="ig-subject-filter">
+            <option value="">Select Subject</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="ig-topic-filter">Topic</label>
+          <select id="ig-topic-filter" disabled>
+            <option value="">Select Topic</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="ig-type-filter">Question Type</label>
+          <select id="ig-type-filter">
+            <option value="">All Types</option>
+            <option value="MCQ">MCQ</option>
+            <option value="QA">Question &amp; Answer</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="ig-search-row">
+        <input type="search"
+               id="ig-search"
+               placeholder="Search question or ID...">
+
+        <button type="button"
+                class="button button-dark"
+                id="ig-load-questions">
+          Load Questions
+        </button>
+      </div>
+
+      <div class="ig-selection-toolbar">
+        <label class="check-row">
+          <input type="checkbox" id="ig-select-all">
+          <span>Select all visible</span>
+        </label>
+
+        <button type="button"
+                class="ig-clear-button"
+                id="ig-clear-selection">
+          Clear selection
+        </button>
+      </div>
+
+      <div class="ig-question-list" id="ig-question-list">
+        <div class="empty-state">
+          <div class="empty-state-icon">Q</div>
+          <strong>No questions loaded</strong>
+          <p>Select a subject and topic to load questions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- IMAGE SETTINGS -->
+    <section class="ig-builder-card">
+      <div class="ig-card-heading">
+        <div>
+          <p class="eyebrow">STEP 02</p>
+          <h3>Image Settings</h3>
+          <p>Configure the output format.</p>
+        </div>
+      </div>
+
+      <div class="ig-settings-fields">
+
+        <div class="field-group">
+          <label for="ig-image-ratio">Aspect Ratio</label>
+          <select id="ig-image-ratio">
+            <option value="4:5">4:5 — Master Layout</option>
+            <option value="1:1">1:1 — Square</option>
+            <option value="4:3">4:3 — Landscape</option>
+            <option value="9:16">9:16 — Portrait</option>
+            <option value="16:9">16:9 — Widescreen</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="ig-layout-format">Content Layout</label>
+          <select id="ig-layout-format">
+            <option value="auto">Automatic by Question Type</option>
+            <option value="qa">Q&amp;A Format</option>
+            <option value="mcq">MCQ Format</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="ig-image-title">Image Heading</label>
+          <input type="text" id="ig-image-title"
+                 maxlength="100" placeholder="Subject or topic name">
+        </div>
+
+        <div class="field-group">
+          <label for="ig-brand-name">Brand Name</label>
+          <input type="text" id="ig-brand-name"
+                 value="preparekora" maxlength="40">
+        </div>
+
+        <div class="field-group">
+          <label for="ig-qr-url">QR Destination URL</label>
+          <input type="url" id="ig-qr-url"
+                 placeholder="https://example.com">
+        </div>
+
+      </div>
+
+      <div class="ig-options">
+        <label class="check-row">
+          <input type="checkbox" id="ig-include-explanations" checked>
+          <span>Include explanations</span>
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" id="ig-highlight-correct" checked>
+          <span>Highlight correct MCQ option</span>
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" id="ig-page-numbers" checked>
+          <span>Show page numbers</span>
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" id="ig-include-qr" checked>
+          <span>Include QR when URL is provided</span>
+        </label>
+      </div>
+
+      <div class="ig-master-note">
+        <strong>Master Design Protected</strong>
+        <p>Inter, Noto Sans Assamese, original header,
+          footer, typography and spacing will be preserved.</p>
+      </div>
+
+      <button type="button"
+              class="button button-dark ig-generate-button"
+              id="ig-generate"
+              disabled>
+        Generate Images
+      </button>
+
+    </section>
+
+  </div>
+
+  <!-- PREVIEW -->
+  <section class="ig-preview-card">
+    <div class="ig-card-heading ig-preview-header">
+      <div>
+        <p class="eyebrow">STEP 03</p>
+        <h3>Generated Images</h3>
+        <p>Preview and review all generated pages.</p>
+      </div>
+
+      <button type="button"
+              class="button button-dark"
+              id="ig-export-all"
+              disabled>
+        Export All Images
+      </button>
+    </div>
+
+    <div class="ig-generated-pages" id="ig-generated-pages">
+      <div class="empty-state">
+        <div class="empty-state-icon">IMG</div>
+        <strong>No generated images yet</strong>
+        <p>Your generated pages will appear here.</p>
+      </div>
+    </div>
+  </section>
+
+</section>
 
           <footer class="workspace-footer">
             <span>PREPAREKORA</span>
