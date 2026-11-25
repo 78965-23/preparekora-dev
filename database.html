@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111318">
+  <meta name="description" content="PrepareKora Administrative Database Management">
+
+  <title>Database Management | PrepareKora</title>
+
+  <link rel="stylesheet" href="database.css">
+  <script src="database.js" defer></script>
+</head>
+
+<body>
+
+  <div class="admin-layout" id="adminLayout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+
+      <div class="brand">
+        <div class="brand-logo">PK</div>
+        <div class="brand-info">
+          <strong>PrepareKora</strong>
+          <span>Administration</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <span class="sidebar-label">WORKSPACE</span>
+
+        <nav class="sidebar-nav" aria-label="Main navigation">
+
+          <a href="dashboard.html" class="nav-item">
+            <span class="nav-icon">▦</span>
+            <span>Overview</span>
+          </a>
+
+          <a href="catalog.html" class="nav-item">
+            <span class="nav-icon">▤</span>
+            <span>Catalog Management</span>
+          </a>
+
+          <a href="database.html" class="nav-item active"
+             aria-current="page">
+            <span class="nav-icon">▣</span>
+            <span>Database</span>
+          </a>
+
+          <a href="settings.html" class="nav-item">
+            <span class="nav-icon">⚙</span>
+            <span>Settings</span>
+          </a>
+
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="system-status">
+          <span class="status-dot"></span>
+          <div>
+            <strong>System Workspace</strong>
+            <small>Administrative Panel</small>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Main workspace -->
+    <div class="main-area">
+
+      <!-- Topbar -->
+      <header class="topbar">
+
+        <button
+          type="button"
+          class="icon-button sidebar-toggle"
+          id="sidebarToggle"
+          aria-label="Toggle navigation"
+          aria-expanded="false"
+          aria-controls="sidebar">
+          ☰
+        </button>
+
+        <div class="breadcrumb">
+          <span>Workspace</span>
+          <span class="breadcrumb-divider">/</span>
+          <strong>Database</strong>
+        </div>
+
+        <div class="topbar-right">
+          <span class="admin-label">Admin Workspace</span>
+        </div>
+
+      </header>
+
+      <!-- Page content -->
+      <main class="page-content">
+
+        <section class="page-heading">
+
+          <div>
+            <span class="eyebrow">CONTENT MANAGEMENT</span>
+            <h1>Database Management</h1>
+            <p>
+              Manage, search and export your question records
+              from the central content database.
+            </p>
+          </div>
+
+          <div class="heading-actions">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="refreshButton">
+              Refresh Data
+            </button>
+
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="exportCsvButton"
+              disabled>
+              Export CSV
+            </button>
+          </div>
+
+        </section>
+
+        <!-- Database panel -->
+        <section class="database-panel">
+
+          <div class="panel-heading">
+            <div>
+              <h2>Content Bank</h2>
+              <p>Browse and manage stored question records.</p>
+            </div>
+
+            <span class="record-count" id="recordCount">
+              0 Records
+            </span>
+          </div>
+
+          <!-- Filters -->
+          <form id="databaseFilters" class="filter-form">
+
+            <div class="filter-grid">
+
+              <div class="form-group">
+                <label for="subjectFilter">Subject</label>
+                <select id="subjectFilter" name="subjectCode" required>
+                  <option value="">Select Subject</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="topicFilter">Topic</label>
+                <select
+                  id="topicFilter"
+                  name="topicCode"
+                  disabled
+                  required>
+                  <option value="">Select Topic</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="typeFilter">Question Type</label>
+                <select id="typeFilter" name="type">
+                  <option value="">All Types</option>
+                  <option value="MCQ">MCQ</option>
+                  <option value="QA">Q&amp;A</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="keywordFilter">Search Records</label>
+                <input
+                  type="search"
+                  id="keywordFilter"
+                  name="keyword"
+                  placeholder="Search question or ID">
+              </div>
+
+              <div class="form-group">
+                <label for="dateFrom">Created From</label>
+                <input type="date" id="dateFrom" name="dateFrom">
+              </div>
+
+              <div class="form-group">
+                <label for="dateTo">Created To</label>
+                <input type="date" id="dateTo" name="dateTo">
+              </div>
+
+            </div>
+
+            <div class="filter-actions">
+
+              <button type="submit" class="btn btn-primary">
+                Apply Filters
+              </button>
+
+              <button
+                type="reset"
+                class="btn btn-secondary"
+                id="resetFiltersButton">
+                Reset Filters
+              </button>
+
+            </div>
+
+          </form>
+
+          <!-- Table -->
+          <div class="table-container">
+
+            <table class="database-table">
+
+              <thead>
+                <tr>
+                  <th>Question ID</th>
+                  <th>Type</th>
+                  <th>Question</th>
+                  <th>Subject</th>
+                  <th>Topic</th>
+                  <th>Created</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody id="recordsBody">
+                <!-- Records loaded from the Worker API -->
+              </tbody>
+
+            </table>
+
+            <div class="empty-state" id="emptyState">
+              <div class="empty-icon">▤</div>
+              <h3>No Records Loaded</h3>
+              <p>
+                Select a subject and topic, then apply filters
+                to view database records.
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Pagination -->
+          <div class="table-footer">
+
+            <span id="paginationInfo">
+              No records available
+            </span>
+
+            <div class="pagination-controls">
+
+              <button
+                type="button"
+                id="previousPage"
+                class="btn btn-secondary"
+                disabled>
+                Previous
+              </button>
+
+              <span id="pageIndicator">Page 0 of 0</span>
+
+              <button
+                type="button"
+                id="nextPage"
+                class="btn btn-secondary"
+                disabled>
+                Next
+              </button>
+
+            </div>
+
+          </div>
+
+          <div
+            class="database-message"
+            id="databaseMessage"
+            role="status"
+            aria-live="polite">
+          </div>
+
+        </section>
+
+      </main>
+
+      <footer class="app-footer">
+        <span>PrepareKora Administrative Workspace</span>
+        <span>Database Management</span>
+      </footer>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
