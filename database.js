@@ -1,4 +1,3 @@
-
 "use strict";
 
 /* =========================================
@@ -604,25 +603,16 @@ function buildCsv(records) {
     "Topic Code",
     "Topic Name",
 
-    "Question English",
-    "Question Assamese",
+    "Question",
+    "Answer",
 
-    "Answer English",
-    "Answer Assamese",
-
-    "Option A English",
-    "Option A Assamese",
-    "Option B English",
-    "Option B Assamese",
-    "Option C English",
-    "Option C Assamese",
-    "Option D English",
-    "Option D Assamese",
+    "Option A",
+    "Option B",
+    "Option C",
+    "Option D",
 
     "Correct Option",
-
-    "Explanation English",
-    "Explanation Assamese",
+    "Explanation",
 
     "Status",
     "Created At",
