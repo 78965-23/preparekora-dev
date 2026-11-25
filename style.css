@@ -472,3 +472,154 @@ button, input, a, label { -webkit-tap-highlight-color: transparent; }
     flex: 1;
   }
 }
+
+/* =========================================
+   PREPAREKORA — TYPOGRAPHY REFINEMENT
+   Existing workspace only
+   ========================================= */
+
+.sidebar-section-label {
+  font-size: 10px;
+}
+
+.nav-link {
+  font-size: 13px;
+}
+
+.sidebar-help-card strong {
+  font-size: 13px;
+}
+
+.sidebar-help-card > span:last-child {
+  font-size: 11px;
+}
+
+.sidebar-footnote,
+.story-footer {
+  font-size: 9px;
+}
+
+.breadcrumb-current {
+  font-size: 13px;
+}
+
+.user-menu-copy strong {
+  font-size: 12px;
+}
+
+.user-menu-copy small {
+  font-size: 11px;
+}
+
+.page-heading-row h1 {
+  font-size: clamp(29px, 3vw, 36px);
+}
+
+.page-subtitle {
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.page-status,
+.section-note {
+  font-size: 11px;
+}
+
+.welcome-copy h2 {
+  font-size: clamp(25px, 3vw, 34px);
+}
+
+.welcome-copy p {
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.banner-kicker {
+  font-size: 10px;
+}
+
+.section-heading h2 {
+  font-size: 21px;
+}
+
+.feature-card {
+  min-height: 126px;
+  padding: 20px;
+}
+
+.feature-card-body strong {
+  font-size: 15px;
+}
+
+.feature-card-body > span {
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.help-card-kicker {
+  font-size: 9px;
+}
+
+.empty-state strong {
+  font-size: 13px;
+}
+
+.empty-state p {
+  font-size: 12px;
+  line-height: 1.75;
+}
+
+.login-heading > p:last-child {
+  font-size: 14px;
+}
+
+.field-group label {
+  font-size: 13px;
+}
+
+.field-group input {
+  font-size: 14px;
+}
+
+.check-row {
+  font-size: 12px;
+}
+
+.login-notice p {
+  font-size: 12px;
+}
+
+.text-link,
+.subtle-link {
+  font-size: 12px;
+}
+
+@media (max-width: 560px) {
+  .page-heading-row h1 {
+    font-size: 29px;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+  }
+
+  .welcome-copy h2 {
+    font-size: 24px;
+  }
+
+  .welcome-copy p {
+    font-size: 12px;
+  }
+
+  .section-heading h2 {
+    font-size: 19px;
+  }
+
+  .feature-card-body strong {
+    font-size: 14px;
+  }
+
+  .feature-card-body > span {
+    font-size: 12px;
+  }
+}
