@@ -470,38 +470,80 @@
     exp.append(label, en);
     if (pair.as) {
       const divider = document.createElement("div"); divider.className = "export-exp-divider";
-      const as = document.createElement("div"); as.className = "export-exp-text export-as"; as.style.fontSize = "20px"; as.textContent = pair.as;
+      const as = document.createElement("div"); as.className = "export-exp-text export-as"; as.textContent = pair.as;
       exp.append(divider, as);
     }
     return exp;
   }
 
-  function makeFrame(settings, pageNo, totalPages, records, scale = 1) {
-    const w = Math.round(settings.dimensions.width * scale);
-    const h = Math.round(settings.dimensions.height * scale);
+  function setFrameMetrics(frame, scale) {
+    const px = value => `${Math.max(1, Math.round(value * scale))}px`;
+    const metrics = {
+      "--frame-pad-y": px(56), "--frame-pad-x": px(64),
+      "--header-gap": px(18), "--header-pad-bottom": px(24),
+      "--brand-font": px(26), "--subject-font": px(20),
+      "--badge-font": px(18), "--badge-min-width": px(140),
+      "--badge-pad-y": px(8), "--badge-pad-x": px(14),
+      "--list-margin-y": px(28), "--item-gap": px(16),
+      "--item-pad-y": px(26), "--item-first-pad-top": px(12),
+      "--row-gap": px(24), "--marker-width": px(36),
+      "--marker-font": px(24), "--marker-margin-top": px(2),
+      "--text-font": px(24), "--options-gap": px(14),
+      "--options-margin-left": px(60), "--option-gap": px(14),
+      "--option-pad-y": px(14), "--option-pad-x": px(18),
+      "--option-font": px(20), "--key-size": px(32),
+      "--key-font": px(15), "--explanation-margin-left": px(60),
+      "--explanation-pad-y": px(20), "--explanation-pad-x": px(24),
+      "--explanation-border": px(5), "--explanation-gap": px(10),
+      "--explanation-label-font": px(16), "--explanation-text-font": px(20),
+      "--footer-gap": px(18), "--footer-pad-top": px(24),
+      "--footer-brand-font": px(20), "--footer-page-font": px(20),
+      "--qr-size": px(64), "--qr-inner-size": px(60),
+      "--two-column-gap": px(30), "--two-column-inset": px(24),
+      "--two-row-gap": px(12)
+    };
+    Object.entries(metrics).forEach(([name, value]) => frame.style.setProperty(name, value));
+  }
+
+  function makeFrame(settings, pageNo, totalPages, records, fitLevel = 0) {
+    const width = settings.dimensions.width;
+    const height = settings.dimensions.height;
+    const aspect = width / height;
+    const layout = aspect >= 1.2 ? "landscape" : aspect >= 0.9 ? "square" : "portrait";
+    const ratioScale = Math.min(1, width / 1080, height / 1350);
+    const fitFactors = [1, 0.95, 0.90, 0.85];
+    const layoutScale = Math.max(0.76, ratioScale * fitFactors[fitLevel] || ratioScale);
+
     const frame = document.createElement("div");
-    frame.className = `export-frame${scale > 1 ? " fit-large" : ""}`;
-    frame.style.width = `${w}px`;
-    frame.style.height = `${h}px`;
+    frame.className = `export-frame export-${layout}`;
+    frame.style.width = `${width}px`;
+    frame.style.height = `${height}px`;
     frame.style.backgroundColor = settings.background;
     frame.style.borderRadius = `${settings.borderRadius}px`;
-    frame.dataset.scale = String(scale);
+    frame.dataset.layout = layout;
+    frame.dataset.layoutScale = layoutScale.toFixed(3);
+    setFrameMetrics(frame, layoutScale);
 
     const header = document.createElement("header"); header.className = "export-header";
-    const brand = document.createElement("div"); brand.className = "export-brand"; brand.textContent = settings.brand;
-    const subject = document.createElement("div"); subject.className = "export-subject"; subject.textContent = settings.heading;
+    const brand = document.createElement("div"); brand.className = "export-brand";
+    brand.textContent = settings.brand;
+    const subject = document.createElement("div"); subject.className = "export-subject";
+    subject.textContent = settings.heading;
     const badge = document.createElement("div"); badge.className = "export-badge";
     header.append(brand, subject, badge);
 
-    const list = document.createElement("div"); list.className = "export-list";
+    const list = document.createElement("div");
+    list.className = `export-list export-list-${layout}${records.length === 2 ? " export-list-two" : ""}`;
     const footer = document.createElement("footer"); footer.className = "export-footer";
-    const footerBrand = document.createElement("div"); footerBrand.className = "export-footer-brand"; footerBrand.textContent = settings.brand;
-    const page = document.createElement("div"); page.className = "export-page-number"; page.textContent = `${pageNo} / ${totalPages}`;
+    const footerBrand = document.createElement("div"); footerBrand.className = "export-footer-brand";
+    footerBrand.textContent = settings.brand;
+    const page = document.createElement("div"); page.className = "export-page-number";
+    page.textContent = `${pageNo} / ${totalPages}`;
     const qr = document.createElement("div"); qr.className = "export-qr";
     if (!settings.qrUrl) qr.hidden = true;
     footer.append(footerBrand, page, qr);
     frame.append(header, list, footer);
-    return { frame, list, badge, page, qr, records, width: w, height: h, scale };
+    return { frame, list, badge, page, qr, records: [...records], width, height, layout, layoutScale };
   }
 
   function questionRange(records) {
@@ -524,45 +566,49 @@
     await document.fonts.ready;
     const stage = makeStage();
     const pages = [];
-    let page = makeFrame(settings, 1, 1, []);
-    stage.appendChild(page.frame);
+    let currentRecords = [];
+    let currentPage = null;
 
-    async function makeOversizedSingle(record) {
-      page.frame.remove();
-      for (const scale of [1.15, 1.3, 1.5, 1.75, 2, 2.25, 2.5]) {
-        const candidate = makeFrame(settings, 1, 1, [], scale);
+    function fitPage(pageRecords, pageNo) {
+      for (let fitLevel = 0; fitLevel < 4; fitLevel++) {
+        const candidate = makeFrame(settings, pageNo, 1, pageRecords, fitLevel);
         stage.appendChild(candidate.frame);
-        candidate.list.appendChild(createQuestionItem(record));
-        candidate.records.push(record);
+        pageRecords.forEach(record => candidate.list.appendChild(createQuestionItem(record)));
         if (!overflows(candidate)) return candidate;
         candidate.frame.remove();
       }
-      throw new Error(`Question ${record.id || "draft"} is too long for the selected layout. Shorten its text; the question was not split or cropped.`);
+      return null;
     }
 
     try {
       for (const record of records) {
-        let item = createQuestionItem(record);
-        page.list.appendChild(item);
-        if (!overflows(page)) {
-          page.records.push(record);
-          continue;
+        // Never place more than two questions on one standalone image.
+        const candidateRecords = [...currentRecords, record];
+        if (candidateRecords.length <= 2) {
+          const candidatePage = fitPage(candidateRecords, pages.length + 1);
+          if (candidatePage) {
+            if (currentPage) currentPage.frame.remove();
+            currentPage = candidatePage;
+            currentRecords = candidateRecords;
+            continue;
+          }
         }
 
-        page.list.removeChild(item);
-        if (page.records.length) {
-          pages.push(page);
-          page = makeFrame(settings, pages.length + 1, 1, []);
-          stage.appendChild(page.frame);
-          item = createQuestionItem(record);
-          page.list.appendChild(item);
-          page.records.push(record);
-          if (overflows(page)) page = await makeOversizedSingle(record);
-        } else {
-          page = await makeOversizedSingle(record);
+        if (currentPage && currentRecords.length) {
+          pages.push(currentPage);
+          currentPage = null;
+          currentRecords = [];
         }
+
+        const singlePage = fitPage([record], pages.length + 1);
+        if (!singlePage) {
+          throw new Error(`Question ${record.id || "draft"} is too long for the selected image ratio. Shorten its text; the question will not be split or cropped.`);
+        }
+        currentPage = singlePage;
+        currentRecords = [record];
       }
-      if (page.records.length) pages.push(page);
+
+      if (currentPage && currentRecords.length) pages.push(currentPage);
       if (!pages.length) throw new Error("No questions were available for rendering.");
 
       pages.forEach((entry, index) => {
