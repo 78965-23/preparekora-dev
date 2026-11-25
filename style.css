@@ -1023,3 +1023,228 @@ button, input, a, label { -webkit-tap-highlight-color: transparent; }
   align-self: center;
   min-height: 150px;
 }
+
+/* Draft editor and editable question review */
+
+.ig-draft-import {
+  margin: 20px 0;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+.ig-draft-mode-row {
+  display: grid;
+  grid-template-columns: minmax(180px, .4fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.ig-format-help {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ig-format-help strong {
+  color: var(--dark-800);
+}
+
+.ig-draft-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ig-draft-textarea {
+  display: block;
+  width: 100%;
+  min-height: 260px;
+  padding: 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: white;
+  color: var(--dark-950);
+  font: 13px/1.8 Inter, "Noto Sans Assamese", sans-serif;
+  resize: vertical;
+}
+
+.ig-draft-textarea:focus {
+  outline: none;
+  border-color: var(--dark-600);
+  box-shadow: 0 0 0 3px rgba(76,83,94,.09);
+}
+
+.ig-draft-guidance,
+.ig-save-note {
+  margin: 10px 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.ig-draft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.ig-draft-format-note {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.ig-draft-feedback {
+  margin-top: 13px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ig-draft-feedback.success { color: #08784f; }
+.ig-draft-feedback.error { color: #b42318; }
+
+.ig-draft-preview:not([hidden]) {
+  display: block;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.ig-draft-preview-heading,
+.ig-parsed-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ig-draft-preview-heading h4 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.ig-draft-preview-heading p {
+  margin: 5px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.ig-draft-summary,
+.ig-parsed-status {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ig-draft-preview-list {
+  display: grid;
+  gap: 15px;
+  margin-top: 16px;
+}
+
+.ig-parsed-card {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.ig-parsed-card h5 {
+  margin: 18px 0 10px;
+  font-size: 13px;
+}
+
+.ig-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.ig-edit-field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  color: var(--dark-700);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ig-edit-field textarea,
+.ig-edit-field select {
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--dark-950);
+  font: 12px/1.7 Inter, "Noto Sans Assamese", sans-serif;
+}
+
+.ig-edit-field textarea {
+  min-height: 75px;
+  resize: vertical;
+}
+
+.ig-edit-field textarea:focus,
+.ig-edit-field select:focus {
+  outline: none;
+  border-color: var(--dark-600);
+}
+
+.ig-correct-answer-field {
+  max-width: 240px;
+  margin-top: 14px;
+}
+
+.ig-parsed-errors {
+  margin-top: 14px;
+  padding: 12px 12px 12px 30px;
+  border-radius: 8px;
+  background: #fff5f4;
+  color: #b42318;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.ig-parsed-saved-id {
+  margin-top: 13px;
+  padding: 11px;
+  border-radius: 8px;
+  background: #ecfdf5;
+  color: #08784f;
+  font: 11px/1.6 monospace;
+  overflow-wrap: anywhere;
+}
+
+.ig-draft-save-error {
+  color: #b42318;
+  font-size: 12px;
+}
+
+.ig-save-drafts {
+  width: 100%;
+  margin-top: 17px;
+}
+
+@media (max-width: 600px) {
+  .ig-draft-import { padding: 14px; }
+  .ig-draft-mode-row,
+  .ig-edit-grid { grid-template-columns: minmax(0, 1fr); }
+  .ig-draft-actions button { flex: 1; }
+}
